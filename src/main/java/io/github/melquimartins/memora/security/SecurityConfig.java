@@ -18,34 +18,52 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    private final SecurityFilter securityFilter;
+  private final SecurityFilter securityFilter;
 
-    public SecurityConfig(SecurityFilter securityFilter) {
-        this.securityFilter = securityFilter;
-    }
+  public SecurityConfig(SecurityFilter securityFilter) {
+    this.securityFilter = securityFilter;
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .build();
-    }
+  @Bean
+  public SecurityFilterChain securityFilterChain(
+        HttpSecurity httpSecurity
+  ) throws Exception {
+    return httpSecurity
+          .csrf(AbstractHttpConfigurer::disable)
+          .sessionManagement(
+                session ->
+                      session.sessionCreationPolicy(
+                            SessionCreationPolicy.STATELESS
+                      )
+          )
+          .addFilterBefore(
+                securityFilter,
+                UsernamePasswordAuthenticationFilter.class
+          )
+          .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(
+                      HttpMethod.POST,
+                      "/api/auth/sign-in"
+                ).permitAll()
+                .requestMatchers(
+                      HttpMethod.POST,
+                      "/api/auth/sign-up"
+                ).permitAll()
+                .anyRequest().authenticated()
+          )
+          .build();
+  }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
-        return configuration.getAuthenticationManager();
-    }
+  @Bean
+  public AuthenticationManager authenticationManager(
+        AuthenticationConfiguration configuration
+  ) {
+    return configuration.getAuthenticationManager();
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
 }

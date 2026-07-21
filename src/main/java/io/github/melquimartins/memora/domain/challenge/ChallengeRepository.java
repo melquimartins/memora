@@ -8,16 +8,17 @@ import java.util.Optional;
 
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
-    List<Challenge> findAllByModuleId(Long moduleId);
+  List<Challenge> findAllByModuleId(Long moduleId);
 
-    Optional<Challenge> findByIdAndModuleId(Long challengeId, Long moduleId);
+  Optional<Challenge> findByIdAndModuleId(Long challengeId, Long moduleId);
 
-    Optional<Challenge> findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-          Long challengeId,
-          Long moduleId,
-          Long workspaceId,
-          Long userId
-    );
+  Optional<Challenge>
+  findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+        Long challengeId,
+        Long moduleId,
+        Long workspaceId,
+        Long userId
+  );
 
-    long deleteByIdAndModuleId(Long challengeId, Long collectionId);
+  long deleteByIdAndModuleId(Long challengeId, Long moduleId);
 }

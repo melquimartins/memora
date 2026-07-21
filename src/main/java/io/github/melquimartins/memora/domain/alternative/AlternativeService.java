@@ -99,7 +99,8 @@ public class AlternativeService {
                 "Desafio não encontrado."
           ));
 
-    Alternative alternative = repository.findByIdAndChallengeId(alternativeId, challengeId)
+    Alternative alternative = repository
+          .findByIdAndChallengeId(alternativeId, challengeId)
           .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Alternativa não encontrada."
@@ -128,7 +129,8 @@ public class AlternativeService {
                 "Desafio não encontrado."
           ));
 
-    Alternative alternative = repository.findByIdAndChallengeId(alternativeId, challengeId)
+    Alternative alternative = repository
+          .findByIdAndChallengeId(alternativeId, challengeId)
           .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Alternativa não encontrada."
@@ -166,7 +168,8 @@ public class AlternativeService {
                 "Desafio não encontrado."
           ));
 
-    long deleted = repository.deleteByIdAndChallengeId(alternativeId, challengeId);
+    long deleted = repository
+          .deleteByIdAndChallengeId(alternativeId, challengeId);
 
     if (deleted == 0) {
       throw new ResponseStatusException(

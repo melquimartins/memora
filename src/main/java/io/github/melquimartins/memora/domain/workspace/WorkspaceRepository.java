@@ -8,9 +8,9 @@ import java.util.Optional;
 
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
-    List<Workspace> findAllByUserId(Long userId);
+  List<Workspace> findAllByUserId(Long userId);
 
-    Optional<Workspace> findByIdAndUserId(Long workspaceId, Long userId);
+  Optional<Workspace> findByIdAndUserId(Long workspaceId, Long userId);
 
-    long deleteByIdAndUserId(Long workspaceId, Long userId);
+  long deleteByIdAndUserId(Long workspaceId, Long userId);
 }

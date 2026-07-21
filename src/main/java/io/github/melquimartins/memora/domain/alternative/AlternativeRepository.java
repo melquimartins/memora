@@ -10,7 +10,10 @@ import java.util.Optional;
 public interface AlternativeRepository extends JpaRepository<Alternative, Long> {
   List<Alternative> findAllByChallengeId(Long challengeId);
 
-  Optional<Alternative> findByIdAndChallengeId(Long alternativeId, Long challengeId);
+  Optional<Alternative> findByIdAndChallengeId(
+        Long alternativeId,
+        Long challengeId
+  );
 
   long deleteByIdAndChallengeId(Long alternativeId, Long challengeId);
 }

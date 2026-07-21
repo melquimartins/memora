@@ -1,6 +1,6 @@
 package io.github.melquimartins.memora.domain.workspace.dto;
 
-import io.github.melquimartins.memora.shared.annotation.NotBlankIfPresent;
+import io.github.melquimartins.memora.shared.validation.annotation.NotBlankIfPresent;
 import jakarta.validation.constraints.Size;
 
 public record UpdateWorkspaceRequest(

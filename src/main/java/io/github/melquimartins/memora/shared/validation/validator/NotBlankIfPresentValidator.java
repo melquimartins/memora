@@ -1,10 +1,12 @@
-package io.github.melquimartins.memora.shared.annotation.validator;
+package io.github.melquimartins.memora.shared.validation.validator;
 
-import io.github.melquimartins.memora.shared.annotation.NotBlankIfPresent;
+import io.github.melquimartins.memora.shared.validation.annotation.NotBlankIfPresent;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class NotBlankIfPresentValidator implements ConstraintValidator<NotBlankIfPresent, String> {
+public class NotBlankIfPresentValidator
+      implements ConstraintValidator<NotBlankIfPresent, String>
+{
 
   @Override
   public boolean isValid(

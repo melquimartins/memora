@@ -17,80 +17,80 @@ import java.util.List;
 @RequestMapping("/api/workspaces")
 public class WorkspaceController {
 
-    private final WorkspaceService service;
+  private final WorkspaceService service;
 
-    public WorkspaceController(WorkspaceService service) {
-        this.service = service;
-    }
+  public WorkspaceController(WorkspaceService service) {
+    this.service = service;
+  }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<WorkspaceResponse>> create(
-            @AuthenticationPrincipal User user,
-            @Valid @RequestBody CreateWorkspaceRequest request
-    ) {
-        WorkspaceResponse workspace = service.create(user, request);
+  @PostMapping
+  public ResponseEntity<ApiResponse<WorkspaceResponse>> create(
+        @AuthenticationPrincipal User user,
+        @Valid @RequestBody CreateWorkspaceRequest request
+  ) {
+    WorkspaceResponse workspace = service.create(user, request);
 
-        ApiResponse<WorkspaceResponse> response = new ApiResponse<>(
-                "Área de trabalho criada com sucesso.",
-                workspace
-        );
+    ApiResponse<WorkspaceResponse> response = new ApiResponse<>(
+          "Área de trabalho criada com sucesso.",
+          workspace
+    );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<WorkspaceResponse>>> getAll(
-            @AuthenticationPrincipal User user
-    ) {
-        List<WorkspaceResponse> workspaces = service.getAll(user);
+  @GetMapping
+  public ResponseEntity<ApiResponse<List<WorkspaceResponse>>> getAll(
+        @AuthenticationPrincipal User user
+  ) {
+    List<WorkspaceResponse> workspaces = service.getAll(user);
 
-        ApiResponse<List<WorkspaceResponse>> response = new ApiResponse<>(
-                "Áreas de trabalho recuperadas com sucesso.",
-                workspaces
-        );
+    ApiResponse<List<WorkspaceResponse>> response = new ApiResponse<>(
+          "Áreas de trabalho recuperadas com sucesso.",
+          workspaces
+    );
 
-        return ResponseEntity.ok(response);
-    }
+    return ResponseEntity.ok(response);
+  }
 
-    @GetMapping("/{workspaceId}")
-    public ResponseEntity<ApiResponse<WorkspaceResponse>> get(
-            @AuthenticationPrincipal User user,
-            @PathVariable Long workspaceId
-    ) {
-        WorkspaceResponse workspace = service.get(user, workspaceId);
+  @GetMapping("/{workspaceId}")
+  public ResponseEntity<ApiResponse<WorkspaceResponse>> get(
+        @AuthenticationPrincipal User user,
+        @PathVariable Long workspaceId
+  ) {
+    WorkspaceResponse workspace = service.get(user, workspaceId);
 
-        ApiResponse<WorkspaceResponse> response = new ApiResponse<>(
-                "Área de trabalho recuperada com sucesso.",
-                workspace
-        );
+    ApiResponse<WorkspaceResponse> response = new ApiResponse<>(
+          "Área de trabalho recuperada com sucesso.",
+          workspace
+    );
 
-        return ResponseEntity.ok(response);
-    }
+    return ResponseEntity.ok(response);
+  }
 
-    @PatchMapping("/{workspaceId}")
-    public ResponseEntity<ApiResponse<WorkspaceResponse>> update(
-            @AuthenticationPrincipal User user,
-            @PathVariable Long workspaceId,
-            @Valid @RequestBody UpdateWorkspaceRequest request
-    ) {
-        WorkspaceResponse workspace = service.update(user, workspaceId, request);
+  @PatchMapping("/{workspaceId}")
+  public ResponseEntity<ApiResponse<WorkspaceResponse>> update(
+        @AuthenticationPrincipal User user,
+        @PathVariable Long workspaceId,
+        @Valid @RequestBody UpdateWorkspaceRequest request
+  ) {
+    WorkspaceResponse workspace = service.update(user, workspaceId, request);
 
-        ApiResponse<WorkspaceResponse> response = new ApiResponse<>(
-                "Área de trabalho atualizada com sucesso.",
-                workspace
-        );
+    ApiResponse<WorkspaceResponse> response = new ApiResponse<>(
+          "Área de trabalho atualizada com sucesso.",
+          workspace
+    );
 
-        return ResponseEntity.ok(response);
-    }
+    return ResponseEntity.ok(response);
+  }
 
-    @DeleteMapping("/{workspaceId}")
-    public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal User user,
-            @PathVariable Long workspaceId
-    ) {
-        service.delete(user, workspaceId);
+  @DeleteMapping("/{workspaceId}")
+  public ResponseEntity<Void> delete(
+        @AuthenticationPrincipal User user,
+        @PathVariable Long workspaceId
+  ) {
+    service.delete(user, workspaceId);
 
-        return ResponseEntity.noContent().build();
-    }
+    return ResponseEntity.noContent().build();
+  }
 
 }

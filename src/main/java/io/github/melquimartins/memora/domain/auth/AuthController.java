@@ -2,6 +2,7 @@ package io.github.melquimartins.memora.domain.auth;
 
 import io.github.melquimartins.memora.domain.auth.dto.SignInRequest;
 import io.github.melquimartins.memora.domain.auth.dto.SignUpRequest;
+import io.github.melquimartins.memora.domain.auth.normalizer.SignUpRequestNormalizer;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,43 +19,53 @@ import java.time.Duration;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthService service;
+  private final AuthService service;
+  private final SignUpRequestNormalizer normalizer;
 
-    public AuthController(AuthService service) {
-        this.service = service;
-    }
+  public AuthController(
+        AuthService service,
+        SignUpRequestNormalizer normalizer
+  ) {
+    this.service = service;
+    this.normalizer = normalizer;
+  }
 
-    @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@Valid @RequestBody SignInRequest request) {
-        String token = service.signIn(request);
+  @PostMapping("/sign-in")
+  public ResponseEntity<String> signIn(
+        @Valid @RequestBody SignInRequest request
+  ) {
+    String token = service.signIn(request);
 
-        ResponseCookie cookie = createTokenCookie(token);
+    ResponseCookie cookie = createTokenCookie(token);
 
-        return ResponseEntity
-                .ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body("Bem-vindo de volta! Login realizado com sucesso.");
-    }
+    return ResponseEntity
+          .ok()
+          .header(HttpHeaders.SET_COOKIE, cookie.toString())
+          .body("Bem-vindo de volta! Login realizado com sucesso.");
+  }
 
-    @PostMapping("/sign-up")
-    public ResponseEntity<String> signUp(@Valid @RequestBody SignUpRequest request) {
-        String token = service.signUp(request);
+  @PostMapping("/sign-up")
+  public ResponseEntity<String> signUp(
+        @Valid @RequestBody SignUpRequest request
+  ) {
+    SignUpRequest normalized = normalizer.normalize(request);
+    String token = service.signUp(normalized);
 
-        ResponseCookie cookie = createTokenCookie(token);
+    ResponseCookie cookie = createTokenCookie(token);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body("Conta criada com sucesso! Bem-vindo ao Memora.");
-    }
+    return ResponseEntity
+          .status(HttpStatus.CREATED)
+          .header(HttpHeaders.SET_COOKIE, cookie.toString())
+          .body("Conta criada com sucesso! Bem-vindo ao Memora.");
+  }
 
-    private ResponseCookie createTokenCookie(String token) {
-        return ResponseCookie.from("token", token)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge((int) Duration.ofDays(7).toSeconds())
-                .build();
-    }
+  private ResponseCookie createTokenCookie(String token) {
+    return ResponseCookie.from("token", token)
+          .httpOnly(true)
+          .secure(false)
+          .path("/")
+          .maxAge((int) Duration.ofDays(7).toSeconds())
+          .build();
+  }
 
 }

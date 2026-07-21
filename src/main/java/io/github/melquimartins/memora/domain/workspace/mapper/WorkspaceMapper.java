@@ -9,19 +9,19 @@ import java.util.List;
 @Component
 public class WorkspaceMapper {
 
-    public WorkspaceResponse toResponse(Workspace workspace) {
-        return new WorkspaceResponse(
-                workspace.getId(),
-                workspace.getUuid(),
-                workspace.getTitle(),
-                workspace.getDescription(),
-                workspace.getCreatedAt(),
-                workspace.getUpdatedAt()
-        );
-    }
+  public WorkspaceResponse toResponse(Workspace workspace) {
+    return new WorkspaceResponse(
+          workspace.getId(),
+          workspace.getUuid(),
+          workspace.getTitle(),
+          workspace.getDescription(),
+          workspace.getCreatedAt(),
+          workspace.getUpdatedAt()
+    );
+  }
 
-    public List<WorkspaceResponse> toResponseList(List<Workspace> workspaces) {
-        return workspaces.stream().map(this::toResponse).toList();
-    }
+  public List<WorkspaceResponse> toResponseList(List<Workspace> workspaces) {
+    return workspaces.stream().map(this::toResponse).toList();
+  }
 
 }

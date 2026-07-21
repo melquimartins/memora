@@ -1,6 +1,6 @@
-package io.github.melquimartins.memora.shared.annotation;
+package io.github.melquimartins.memora.shared.validation.annotation;
 
-import io.github.melquimartins.memora.shared.annotation.validator.NotBlankIfPresentValidator;
+import io.github.melquimartins.memora.shared.validation.validator.NotBlankIfPresentValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -10,7 +10,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.RECORD_COMPONENT})
+@Target({
+      ElementType.FIELD,
+      ElementType.PARAMETER,
+      ElementType.RECORD_COMPONENT
+})
 @Constraint(validatedBy = NotBlankIfPresentValidator.class)
 public @interface NotBlankIfPresent {
 
