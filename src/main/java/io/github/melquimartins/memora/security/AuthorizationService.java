@@ -10,20 +10,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthorizationService implements UserDetailsService {
 
-  private final UserRepository repository;
+    private final UserRepository repository;
 
-  public AuthorizationService(UserRepository repository) {
-    this.repository = repository;
-  }
+    public AuthorizationService(UserRepository repository) {
+        this.repository = repository;
+    }
 
-  @Override
-  @NullMarked
-  public UserDetails loadUserByUsername(String username)
-        throws UsernameNotFoundException
-  {
-    return repository.findByEmail(username).orElseThrow(() ->
-          new UsernameNotFoundException("Usuário não encontrado.")
-    );
-  }
+    @Override
+    @NullMarked
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+        return repository.findByEmail(username).orElseThrow(() ->
+                new UsernameNotFoundException("Usuário não encontrado.")
+        );
+    }
 
 }

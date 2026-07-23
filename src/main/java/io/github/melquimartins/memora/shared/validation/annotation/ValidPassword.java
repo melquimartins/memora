@@ -11,15 +11,15 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-      ElementType.FIELD,
-      ElementType.PARAMETER,
-      ElementType.RECORD_COMPONENT
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.RECORD_COMPONENT
 })
 @Constraint(validatedBy = ValidPasswordValidator.class)
 public @interface ValidPassword {
-  String message() default "Informe uma senha válida.";
+    String message() default "Informe uma senha válida.";
 
-  Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-  Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 }

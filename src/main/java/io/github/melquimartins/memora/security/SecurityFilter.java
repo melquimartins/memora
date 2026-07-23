@@ -19,66 +19,65 @@ import java.io.IOException;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
-  private final JwtService jwtService;
-  private final UserRepository repository;
+    private final JwtService jwtService;
+    private final UserRepository repository;
 
-  public SecurityFilter(JwtService jwtService, UserRepository repository) {
-    this.jwtService = jwtService;
-    this.repository = repository;
-  }
+    public SecurityFilter(JwtService jwtService, UserRepository repository) {
+        this.jwtService = jwtService;
+        this.repository = repository;
+    }
 
-  @Override
-  protected void doFilterInternal(
-        @NonNull
-        HttpServletRequest request,
-        @NonNull
-        HttpServletResponse response,
-        @NonNull
-        FilterChain filterChain
-  ) throws ServletException, IOException
-  {
-    String token = recoverToken(request);
+    @Override
+    protected void doFilterInternal(
+            @NonNull
+            HttpServletRequest request,
+            @NonNull
+            HttpServletResponse response,
+            @NonNull
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+        String token = recoverToken(request);
 
-    if (token != null) {
-      try {
-        String email = jwtService.validateToken(token);
+        if (token != null) {
+            try {
+                String email = jwtService.validateToken(token);
 
-        if (email != null) {
-          User user = repository.findByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("Usuário não encontrado.")
-          );
+                if (email != null) {
+                    User user = repository.findByEmail(email).orElseThrow(() ->
+                            new UsernameNotFoundException("Usuário não encontrado.")
+                    );
 
-          var authenticationToken = new UsernamePasswordAuthenticationToken(
-                user,
-                false,
-                user.getAuthorities()
-          );
+                    var authenticationToken = new UsernamePasswordAuthenticationToken(
+                            user,
+                            false,
+                            user.getAuthorities()
+                    );
 
-          SecurityContextHolder.getContext()
-                .setAuthentication(authenticationToken);
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authenticationToken);
+                }
+            } catch (Exception e) {
+                SecurityContextHolder.clearContext();
+            }
         }
-      } catch (Exception e) {
-        SecurityContextHolder.clearContext();
-      }
+
+        filterChain.doFilter(request, response);
     }
 
-    filterChain.doFilter(request, response);
-  }
+    private String recoverToken(@NonNull HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
 
-  private String recoverToken(@NonNull HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
 
-    if (cookies == null) {
-      return null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("token")) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
-
-    for (Cookie cookie : cookies) {
-      if (cookie.getName().equals("token")) {
-        return cookie.getValue();
-      }
-    }
-
-    return null;
-  }
 
 }

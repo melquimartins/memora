@@ -5,20 +5,19 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class NotBlankIfPresentValidator
-      implements ConstraintValidator<NotBlankIfPresent, String>
-{
+        implements ConstraintValidator<NotBlankIfPresent, String> {
 
-  @Override
-  public boolean isValid(
-        String value,
-        ConstraintValidatorContext context
-  ) {
+    @Override
+    public boolean isValid(
+            String value,
+            ConstraintValidatorContext context
+    ) {
 
-    if (value == null) {
-      return true;
+        if (value == null) {
+            return true;
+        }
+
+        return !value.trim().isEmpty();
     }
-
-    return !value.trim().isEmpty();
-  }
 
 }

@@ -23,57 +23,58 @@ import java.util.List;
 @Table(name = "users")
 public class User implements UserDetails {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(nullable = false)
-  private String name;
+    @Column(nullable = false)
+    private String name;
 
-  @Column(nullable = false, unique = true)
-  private String email;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-  @Column(nullable = false)
-  private String password;
+    @Column(nullable = false)
+    private String password;
 
-  @OneToMany(
-        mappedBy = "user",
-        cascade = CascadeType.ALL,
-        fetch = FetchType.LAZY
-  )
-  private List<Workspace> workspaces = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private List<Workspace> workspaces = new ArrayList<>();
 
-  @CreationTimestamp
-  @Column(name = "created_at")
-  private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-  @CreationTimestamp
-  @Column(name = "updated_at")
-  private LocalDateTime updatedAt;
+    @CreationTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-  public User() {}
+    public User() {
+    }
 
-  public User(String name, String email, String password) {
-    this.name = name;
-    this.email = email;
-    this.password = password;
-  }
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
 
-  @NullMarked
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return Collections.emptyList();
-  }
+    @NullMarked
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
+    }
 
-  @Override
-  public @Nullable String getPassword() {
-    return password;
-  }
+    @Override
+    public @Nullable String getPassword() {
+        return password;
+    }
 
-  @NullMarked
-  @Override
-  public String getUsername() {
-    return email;
-  }
+    @NullMarked
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
 }

@@ -11,17 +11,17 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-      ElementType.FIELD,
-      ElementType.PARAMETER,
-      ElementType.RECORD_COMPONENT
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.RECORD_COMPONENT
 })
 @Constraint(validatedBy = ValidFullNameValidator.class)
 public @interface ValidFullName {
 
-  String message() default "Informe nome e sobrenome válidos.";
+    String message() default "Informe nome e sobrenome válidos.";
 
-  Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-  Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }

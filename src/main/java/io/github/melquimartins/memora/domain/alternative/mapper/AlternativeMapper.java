@@ -10,18 +10,18 @@ import java.util.List;
 @Component
 public class AlternativeMapper {
 
-  public AlternativeResponse toResponse(Alternative alternative) {
-    return new AlternativeResponse(
-          alternative.getId(),
-          alternative.getText(),
-          alternative.getCorrect(),
-          alternative.getCreatedAt(),
-          alternative.getUpdatedAt()
-    );
-  }
+    public AlternativeResponse toResponse(Alternative alternative) {
+        return new AlternativeResponse(
+                alternative.getId(),
+                alternative.getText(),
+                alternative.getCorrect(),
+                alternative.getCreatedAt(),
+                alternative.getUpdatedAt()
+        );
+    }
 
-  public List<AlternativeResponse> toResponseList(List<Alternative> alternatives) {
-    return alternatives.stream().map(this::toResponse).toList();
-  }
+    public List<AlternativeResponse> toResponseList(List<Alternative> alternatives) {
+        return alternatives.stream().map(this::toResponse).toList();
+    }
 
 }

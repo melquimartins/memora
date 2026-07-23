@@ -19,52 +19,53 @@ import java.util.UUID;
 @Table(name = "workspaces")
 public class Workspace {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(nullable = false, unique = true)
-  private UUID uuid;
+    @Column(nullable = false, unique = true)
+    private UUID uuid;
 
-  @PrePersist
-  protected void onCreate() {
-    if (this.uuid == null) {
-      this.uuid = UUID.randomUUID();
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
     }
-  }
 
-  @Setter
-  @Column(nullable = false)
-  private String title;
+    @Setter
+    @Column(nullable = false)
+    private String title;
 
-  @Setter
-  private String description;
+    @Setter
+    private String description;
 
-  @Setter
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-  @OneToMany(
-        mappedBy = "workspace",
-        cascade = CascadeType.ALL,
-        fetch = FetchType.LAZY
-  )
-  private List<Module> modules = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "workspace",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private List<Module> modules = new ArrayList<>();
 
-  @CreationTimestamp
-  @Column(name = "created_at")
-  private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-  @CreationTimestamp
-  @Column(name = "updated_at")
-  private LocalDateTime updatedAt;
+    @CreationTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-  public Workspace() {}
+    public Workspace() {
+    }
 
-  public Workspace(String title, String description) {
-    this.title = title;
-    this.description = description;
-  }
+    public Workspace(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
 
 }

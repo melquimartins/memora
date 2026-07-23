@@ -8,12 +8,12 @@ import java.util.Optional;
 
 @Repository
 public interface AlternativeRepository extends JpaRepository<Alternative, Long> {
-  List<Alternative> findAllByChallengeId(Long challengeId);
+    List<Alternative> findAllByChallengeId(Long challengeId);
 
-  Optional<Alternative> findByIdAndChallengeId(
-        Long alternativeId,
-        Long challengeId
-  );
+    Optional<Alternative> findByIdAndChallengeId(
+            Long alternativeId,
+            Long challengeId
+    );
 
-  long deleteByIdAndChallengeId(Long alternativeId, Long challengeId);
+    long deleteByIdAndChallengeId(Long alternativeId, Long challengeId);
 }

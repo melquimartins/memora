@@ -13,36 +13,37 @@ import java.time.LocalDateTime;
 @Table(name = "alternatives")
 public class Alternative {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Setter
-  @Column(nullable = false)
-  private String text;
+    @Setter
+    @Column(nullable = false)
+    private String text;
 
-  @Setter
-  @Column(nullable = false)
-  private Boolean correct = false;
+    @Setter
+    @Column(nullable = false)
+    private Boolean correct = false;
 
-  @Setter
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "challenge_id", nullable = false)
-  private Challenge challenge;
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_id", nullable = false)
+    private Challenge challenge;
 
-  @CreationTimestamp
-  @Column(name = "created_at")
-  private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-  @CreationTimestamp
-  @Column(name = "updated_at")
-  private LocalDateTime updatedAt;
+    @CreationTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-  public Alternative() {}
+    public Alternative() {
+    }
 
-  public Alternative(String text, boolean correct) {
-    this.text = text;
-    this.correct = correct;
-  }
+    public Alternative(String text, boolean correct) {
+        this.text = text;
+        this.correct = correct;
+    }
 
 }

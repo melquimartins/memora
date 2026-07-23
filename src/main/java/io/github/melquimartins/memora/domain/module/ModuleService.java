@@ -32,9 +32,9 @@ public class ModuleService {
     }
 
     public ModuleResponse create(
-          User user,
-          Long workspaceId,
-          CreateModuleRequest request
+            User user,
+            Long workspaceId,
+            CreateModuleRequest request
     ) {
         Workspace workspace = workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
                 .orElseThrow(() -> new ResponseStatusException(
@@ -55,8 +55,8 @@ public class ModuleService {
     }
 
     public List<ModuleResponse> getAll(
-          User user,
-          Long workspaceId
+            User user,
+            Long workspaceId
     ) {
         workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
                 .orElseThrow(() -> new ResponseStatusException(
@@ -70,22 +70,22 @@ public class ModuleService {
     }
 
     public ModuleResponse get(
-          User user,
-          Long workspaceId,
-          Long collectionId
+            User user,
+            Long workspaceId,
+            Long collectionId
     ) {
         workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
-              .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Área de trabalho não encontrada."
-              ));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Área de trabalho não encontrada."
+                ));
 
         Module module = repository.findByIdAndWorkspaceId(
-              collectionId,
-              workspaceId
+                collectionId,
+                workspaceId
         ).orElseThrow(() -> new ResponseStatusException(
-              HttpStatus.NOT_FOUND,
-              "Módulo não encontrado."
+                HttpStatus.NOT_FOUND,
+                "Módulo não encontrado."
         ));
 
         return mapper.toResponse(module);
@@ -104,11 +104,11 @@ public class ModuleService {
                 ));
 
         Module module = repository
-              .findByIdAndWorkspaceId(collectionId, workspaceId)
-              .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Módulo não encontrado."
-              ));
+                .findByIdAndWorkspaceId(collectionId, workspaceId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Módulo não encontrado."
+                ));
 
         if (request.title() != null) {
             module.setTitle(request.title());
@@ -124,18 +124,18 @@ public class ModuleService {
     }
 
     public void delete(
-          User user,
-          Long workspaceId,
-          Long collectionId
+            User user,
+            Long workspaceId,
+            Long collectionId
     ) {
         workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
-              .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Área de trabalho não encontrada."
-              ));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Área de trabalho não encontrada."
+                ));
 
         long deleted = repository
-              .deleteByIdAndWorkspaceId(collectionId, workspaceId);
+                .deleteByIdAndWorkspaceId(collectionId, workspaceId);
 
         if (deleted == 0) {
             throw new ResponseStatusException(

@@ -26,369 +26,370 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ChallengeServiceTest {
 
-  @Mock
-  private ModuleRepository moduleRepository;
+    @Mock
+    private ModuleRepository moduleRepository;
 
-  @Mock
-  private ChallengeRepository repository;
+    @Mock
+    private ChallengeRepository repository;
 
-  @Mock
-  private ChallengeMapper mapper;
+    @Mock
+    private ChallengeMapper mapper;
 
-  @InjectMocks
-  private ChallengeService service;
+    @InjectMocks
+    private ChallengeService service;
 
-  @Test
-  @DisplayName("Deve criar um desafio com sucesso")
-  void shouldCreateChallengeSuccessfully() {
-    User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
-    user.setId(1L);
+    @Test
+    @DisplayName("Deve criar um desafio com sucesso")
+    void shouldCreateChallengeSuccessfully() {
+        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        user.setId(1L);
 
-    Long workspaceId = 10L;
+        Long workspaceId = 10L;
 
-    Long moduleId = 20L;
-    Module module = new Module("Módulo", "Descrição");
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
 
-    ChallengeRequest request = new ChallengeRequest("Desafio");
+        ChallengeRequest request = new ChallengeRequest("Desafio");
 
-    Challenge challenge = new Challenge(request.title());
-    challenge.setModule(module);
+        Challenge challenge = new Challenge(request.title());
+        challenge.setModule(module);
 
-    when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-          moduleId,
-          workspaceId,
-          user.getId()
-    )).thenReturn(Optional.of(module));
-    when(repository.save(any(Challenge.class))).thenReturn(challenge);
-
-    ChallengeResponse expectedResponse = new ChallengeResponse(
-          1L,
-          UUID.randomUUID(),
-          challenge.getTitle(),
-          LocalDateTime.now(),
-          LocalDateTime.now()
-    );
-
-    when(mapper.toResponse(any(Challenge.class))).thenReturn(expectedResponse);
-
-    ChallengeResponse response = service.create(
-          user,
-          workspaceId,
-          moduleId,
-          request
-    );
-
-    assertNotNull(response);
-    assertEquals(1L, response.id());
-    assertEquals("Desafio", response.title());
-    verify(moduleRepository, times(1))
-          .findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-          );
-    verify(repository, times(1)).save(any(Challenge.class));
-    verify(mapper, times(1)).toResponse(any(Challenge.class));
-  }
+        )).thenReturn(Optional.of(module));
+        when(repository.save(any(Challenge.class))).thenReturn(challenge);
 
-  @Test
-  @DisplayName("Deve lançar exceção ao criar desafio em módulo inexistente")
-  void shouldThrowExceptionWhenModuleNotFoundOnCreate() {
-    User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
-    user.setId(1L);
+        ChallengeResponse expectedResponse = new ChallengeResponse(
+                1L,
+                UUID.randomUUID(),
+                challenge.getTitle(),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
-    Long workspaceId = 10L;
-    Long moduleId = 20L;
+        when(mapper.toResponse(any(Challenge.class))).thenReturn(expectedResponse);
 
-    ChallengeRequest request = new ChallengeRequest("Desafio");
+        ChallengeResponse response = service.create(
+                user,
+                workspaceId,
+                moduleId,
+                request
+        );
 
-    when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-          moduleId,
-          workspaceId,
-          user.getId()
-    )).thenReturn(Optional.empty());
+        assertNotNull(response);
+        assertEquals(1L, response.id());
+        assertEquals("Desafio", response.title());
+        verify(moduleRepository, times(1))
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(
+                        moduleId,
+                        workspaceId,
+                        user.getId()
+                );
+        verify(repository, times(1)).save(any(Challenge.class));
+        verify(mapper, times(1)).toResponse(any(Challenge.class));
+    }
 
-    ResponseStatusException exception = assertThrows(
-          ResponseStatusException.class,
-          () -> service.create(user, workspaceId, moduleId, request)
-    );
+    @Test
+    @DisplayName("Deve lançar exceção ao criar desafio em módulo inexistente")
+    void shouldThrowExceptionWhenModuleNotFoundOnCreate() {
+        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        user.setId(1L);
 
-    assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-    verify(moduleRepository, times(1))
-          .findByIdAndWorkspaceIdAndWorkspaceUserId(
+        Long workspaceId = 10L;
+        Long moduleId = 20L;
+
+        ChallengeRequest request = new ChallengeRequest("Desafio");
+
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-          );
-    verifyNoInteractions(repository);
-  }
+        )).thenReturn(Optional.empty());
 
-  @Test
-  @DisplayName("Deve buscar todos os desafios com sucesso")
-  void shouldGetAllChallengesSuccessfully() {
-    User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
-    user.setId(1L);
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.create(user, workspaceId, moduleId, request)
+        );
 
-    Long workspaceId = 10L;
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(moduleRepository, times(1))
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(
+                        moduleId,
+                        workspaceId,
+                        user.getId()
+                );
+        verifyNoInteractions(repository);
+    }
 
-    Long moduleId = 20L;
-    Module module = new Module("Módulo", "Descrição");
+    @Test
+    @DisplayName("Deve buscar todos os desafios com sucesso")
+    void shouldGetAllChallengesSuccessfully() {
+        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        user.setId(1L);
 
-    Challenge c1 = new Challenge("Desafio 1");
-    List<Challenge> challenges = List.of(c1);
+        Long workspaceId = 10L;
 
-    when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-          moduleId,
-          workspaceId,
-          user.getId()
-    )).thenReturn(Optional.of(module));
-    when(repository.findAllByModuleId(moduleId)).thenReturn(challenges);
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
 
-    ChallengeResponse r1 = new ChallengeResponse(
-          1L,
-          UUID.randomUUID(),
-          c1.getTitle(),
-          LocalDateTime.now(),
-          LocalDateTime.now()
-    );
-    List<ChallengeResponse> expectedResponses = List.of(r1);
+        Challenge c1 = new Challenge("Desafio 1");
+        List<Challenge> challenges = List.of(c1);
 
-    when(mapper.toResponseList(challenges)).thenReturn(expectedResponses);
-
-    List<ChallengeResponse> response = service.getAll(
-          user,
-          workspaceId,
-          moduleId
-    );
-
-    assertNotNull(response);
-    assertEquals(1, response.size());
-    assertEquals("Desafio 1", response.getFirst().title());
-    verify(moduleRepository, times(1))
-          .findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-          );
-    verify(repository, times(1)).findAllByModuleId(moduleId);
-    verify(mapper, times(1)).toResponseList(challenges);
-  }
+        )).thenReturn(Optional.of(module));
+        when(repository.findAllByModuleId(moduleId)).thenReturn(challenges);
 
-  @Test
-  @DisplayName("Deve obter um desafio específico por ID com sucesso")
-  void shouldGetChallengeByIdSuccessfully() {
-    User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
-    user.setId(1L);
+        ChallengeResponse r1 = new ChallengeResponse(
+                1L,
+                UUID.randomUUID(),
+                c1.getTitle(),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        List<ChallengeResponse> expectedResponses = List.of(r1);
 
-    Long workspaceId = 10L;
+        when(mapper.toResponseList(challenges)).thenReturn(expectedResponses);
 
-    Long moduleId = 20L;
-    Module module = new Module("Módulo", "Descrição");
+        List<ChallengeResponse> response = service.getAll(
+                user,
+                workspaceId,
+                moduleId
+        );
 
-    Long challengeId = 30L;
-    Challenge challenge = new Challenge("Desafio");
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertEquals("Desafio 1", response.getFirst().title());
+        verify(moduleRepository, times(1))
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(
+                        moduleId,
+                        workspaceId,
+                        user.getId()
+                );
+        verify(repository, times(1)).findAllByModuleId(moduleId);
+        verify(mapper, times(1)).toResponseList(challenges);
+    }
 
-    when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-          moduleId,
-          workspaceId,
-          user.getId()
-    )).thenReturn(Optional.of(module));
-    when(repository.findByIdAndModuleId(challengeId, moduleId))
-          .thenReturn(Optional.of(challenge));
+    @Test
+    @DisplayName("Deve obter um desafio específico por ID com sucesso")
+    void shouldGetChallengeByIdSuccessfully() {
+        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        user.setId(1L);
 
-    ChallengeResponse expectedResponse = new ChallengeResponse(
-          challengeId,
-          UUID.randomUUID(),
-          challenge.getTitle(),
-          LocalDateTime.now(),
-          LocalDateTime.now()
-    );
+        Long workspaceId = 10L;
 
-    when(mapper.toResponse(challenge)).thenReturn(expectedResponse);
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
 
-    ChallengeResponse response = service.get(
-          user,
-          workspaceId,
-          moduleId,
-          challengeId
-    );
+        Long challengeId = 30L;
+        Challenge challenge = new Challenge("Desafio");
 
-    assertNotNull(response);
-    assertEquals(challengeId, response.id());
-    verify(moduleRepository, times(1))
-          .findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-          );
-    verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
-    verify(mapper, times(1)).toResponse(challenge);
-  }
+        )).thenReturn(Optional.of(module));
+        when(repository.findByIdAndModuleId(challengeId, moduleId))
+                .thenReturn(Optional.of(challenge));
 
-  @Test
-  @DisplayName("Deve lançar exceção ao buscar desafio inexistente")
-  void shouldThrowExceptionWhenChallengeNotFoundOnGet() {
-    User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
-    user.setId(1L);
+        ChallengeResponse expectedResponse = new ChallengeResponse(
+                challengeId,
+                UUID.randomUUID(),
+                challenge.getTitle(),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
-    Long workspaceId = 10L;
+        when(mapper.toResponse(challenge)).thenReturn(expectedResponse);
 
-    Long moduleId = 20L;
-    Module module = new Module("Módulo", "Descrição");
+        ChallengeResponse response = service.get(
+                user,
+                workspaceId,
+                moduleId,
+                challengeId
+        );
 
-    Long challengeId = 30L;
+        assertNotNull(response);
+        assertEquals(challengeId, response.id());
+        verify(moduleRepository, times(1))
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(
+                        moduleId,
+                        workspaceId,
+                        user.getId()
+                );
+        verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
+        verify(mapper, times(1)).toResponse(challenge);
+    }
 
-    when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-          moduleId,
-          workspaceId,
-          user.getId()
-    )).thenReturn(Optional.of(module));
-    when(repository.findByIdAndModuleId(
-          challengeId,
-          moduleId
-    )).thenReturn(Optional.empty());
+    @Test
+    @DisplayName("Deve lançar exceção ao buscar desafio inexistente")
+    void shouldThrowExceptionWhenChallengeNotFoundOnGet() {
+        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        user.setId(1L);
 
-    ResponseStatusException exception = assertThrows(
-          ResponseStatusException.class,
-          () -> service.get(user, workspaceId, moduleId, challengeId)
-    );
+        Long workspaceId = 10L;
 
-    assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-    assertEquals("Desafio não encontrado.", exception.getReason());
-    verify(moduleRepository, times(1))
-          .findByIdAndWorkspaceIdAndWorkspaceUserId(
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
+
+        Long challengeId = 30L;
+
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-          );
-    verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
-  }
+        )).thenReturn(Optional.of(module));
+        when(repository.findByIdAndModuleId(
+                challengeId,
+                moduleId
+        )).thenReturn(Optional.empty());
 
-  @Test
-  @DisplayName("Deve atualizar um desafio com sucesso")
-  void shouldUpdateChallengeSuccessfully() {
-    User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
-    user.setId(1L);
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.get(user, workspaceId, moduleId, challengeId)
+        );
 
-    Long workspaceId = 10L;
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Desafio não encontrado.", exception.getReason());
+        verify(moduleRepository, times(1))
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(
+                        moduleId,
+                        workspaceId,
+                        user.getId()
+                );
+        verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
+    }
 
-    Long moduleId = 20L;
-    Module module = new Module("Módulo", "Descrição");
+    @Test
+    @DisplayName("Deve atualizar um desafio com sucesso")
+    void shouldUpdateChallengeSuccessfully() {
+        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        user.setId(1L);
 
-    Long challengeId = 30L;
-    Challenge challenge = new Challenge("Desafio Antigo");
+        Long workspaceId = 10L;
 
-    ChallengeRequest request = new ChallengeRequest("Desafio Novo");
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
 
-    when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-          moduleId,
-          workspaceId,
-          user.getId()
-    )).thenReturn(Optional.of(module));
-    when(repository.findByIdAndModuleId(challengeId, moduleId))
-          .thenReturn(Optional.of(challenge));
-    when(repository.save(challenge)).thenReturn(challenge);
+        Long challengeId = 30L;
+        Challenge challenge = new Challenge("Desafio Antigo");
 
-    ChallengeResponse expectedResponse = new ChallengeResponse(
-          challengeId,
-          UUID.randomUUID(),
-          request.title(),
-          LocalDateTime.now(),
-          LocalDateTime.now()
-    );
+        ChallengeRequest request = new ChallengeRequest("Desafio Novo");
 
-    when(mapper.toResponse(challenge)).thenReturn(expectedResponse);
-
-    ChallengeResponse response = service.update(
-          user,
-          workspaceId,
-          moduleId,
-          challengeId,
-          request
-    );
-
-    assertNotNull(response);
-    assertEquals("Desafio Novo", response.title());
-    verify(moduleRepository, times(1))
-          .findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-          );
-    verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
-    verify(repository, times(1)).save(challenge);
-    verify(mapper, times(1)).toResponse(challenge);
-  }
+        )).thenReturn(Optional.of(module));
+        when(repository.findByIdAndModuleId(challengeId, moduleId))
+                .thenReturn(Optional.of(challenge));
+        when(repository.save(challenge)).thenReturn(challenge);
 
-  @Test
-  @DisplayName("Deve deletar um desafio com sucesso")
-  void shouldDeleteChallengeSuccessfully() {
-    User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
-    user.setId(1L);
+        ChallengeResponse expectedResponse = new ChallengeResponse(
+                challengeId,
+                UUID.randomUUID(),
+                request.title(),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
-    Long workspaceId = 10L;
+        when(mapper.toResponse(challenge)).thenReturn(expectedResponse);
 
-    Long moduleId = 20L;
-    Module module = new Module("Módulo", "Descrição");
+        ChallengeResponse response = service.update(
+                user,
+                workspaceId,
+                moduleId,
+                challengeId,
+                request
+        );
 
-    Long challengeId = 30L;
+        assertNotNull(response);
+        assertEquals("Desafio Novo", response.title());
+        verify(moduleRepository, times(1))
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(
+                        moduleId,
+                        workspaceId,
+                        user.getId()
+                );
+        verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
+        verify(repository, times(1)).save(challenge);
+        verify(mapper, times(1)).toResponse(challenge);
+    }
 
-    when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-          moduleId,
-          workspaceId,
-          user.getId()
-    )).thenReturn(Optional.of(module));
-    when(repository.deleteByIdAndModuleId(challengeId, moduleId)).thenReturn(1L);
+    @Test
+    @DisplayName("Deve deletar um desafio com sucesso")
+    void shouldDeleteChallengeSuccessfully() {
+        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        user.setId(1L);
 
-    assertDoesNotThrow(() -> service.delete(
-          user,
-          workspaceId,
-          moduleId,
-          challengeId)
-    );
+        Long workspaceId = 10L;
 
-    verify(moduleRepository, times(1))
-          .findByIdAndWorkspaceIdAndWorkspaceUserId(
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
+
+        Long challengeId = 30L;
+
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-          );
-    verify(repository, times(1)).deleteByIdAndModuleId(challengeId, moduleId);
-  }
+        )).thenReturn(Optional.of(module));
+        when(repository.deleteByIdAndModuleId(challengeId, moduleId)).thenReturn(1L);
 
-  @Test
-  @DisplayName("Deve lançar exceção ao deletar desafio inexistente")
-  void shouldThrowExceptionWhenChallengeNotFoundOnDelete() {
-    User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
-    user.setId(1L);
+        assertDoesNotThrow(() -> service.delete(
+                        user,
+                        workspaceId,
+                        moduleId,
+                        challengeId
+                )
+        );
 
-    Long workspaceId = 10L;
+        verify(moduleRepository, times(1))
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(
+                        moduleId,
+                        workspaceId,
+                        user.getId()
+                );
+        verify(repository, times(1)).deleteByIdAndModuleId(challengeId, moduleId);
+    }
 
-    Long moduleId = 20L;
-    Module module = new Module("Módulo", "Descrição");
+    @Test
+    @DisplayName("Deve lançar exceção ao deletar desafio inexistente")
+    void shouldThrowExceptionWhenChallengeNotFoundOnDelete() {
+        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        user.setId(1L);
 
-    Long challengeId = 30L;
+        Long workspaceId = 10L;
 
-    when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-          moduleId,
-          workspaceId,
-          user.getId()
-    )).thenReturn(Optional.of(module));
-    when(repository.deleteByIdAndModuleId(challengeId, moduleId)).thenReturn(0L);
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
 
-    ResponseStatusException exception = assertThrows(
-          ResponseStatusException.class,
-          () -> service.delete(user, workspaceId, moduleId, challengeId)
-    );
+        Long challengeId = 30L;
 
-    assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-    verify(moduleRepository, times(1))
-          .findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-          );
-    verify(repository, times(1)).deleteByIdAndModuleId(challengeId, moduleId);
-  }
+        )).thenReturn(Optional.of(module));
+        when(repository.deleteByIdAndModuleId(challengeId, moduleId)).thenReturn(0L);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.delete(user, workspaceId, moduleId, challengeId)
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(moduleRepository, times(1))
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(
+                        moduleId,
+                        workspaceId,
+                        user.getId()
+                );
+        verify(repository, times(1)).deleteByIdAndModuleId(challengeId, moduleId);
+    }
 
 }

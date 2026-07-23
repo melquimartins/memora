@@ -1,10 +1,15 @@
 package io.github.melquimartins.memora.domain.module;
 
-import io.github.melquimartins.memora.domain.module.dto.ModuleResponse;
-import io.github.melquimartins.memora.shared.dto.ApiResponse;
 import io.github.melquimartins.memora.domain.module.dto.CreateModuleRequest;
+import io.github.melquimartins.memora.domain.module.dto.ModuleResponse;
 import io.github.melquimartins.memora.domain.module.dto.UpdateModuleRequest;
 import io.github.melquimartins.memora.domain.user.User;
+import io.github.melquimartins.memora.shared.dto.ResponseEnvelope;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,94 +17,172 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(
+        name = "Módulo",
+        description = "Endpoints de gerenciamento de módulos"
+)
 @RestController
 @RequestMapping("/api/workspaces/{workspaceId}/modules")
 public class ModuleController {
 
-  private final ModuleService service;
+    private final ModuleService service;
 
-  public ModuleController(ModuleService service) {
-    this.service = service;
-  }
+    public ModuleController(ModuleService service) {
+        this.service = service;
+    }
 
-  @PostMapping
-  public ResponseEntity<ApiResponse<ModuleResponse>> create(
-        @AuthenticationPrincipal User user,
-        @PathVariable Long workspaceId,
-        @RequestBody CreateModuleRequest request
-  ) {
-    ModuleResponse collection = service.create(user, workspaceId, request);
+    @Operation(
+            summary = "Cria um novo módulo",
+            description = "Cria um módulo a partir dos dados informados"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Módulo criado com sucesso."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados de requisição inválidos."
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Área de trabalho não encontrada."
+            )
+    })
+    @PostMapping
+    public ResponseEntity<ResponseEnvelope<ModuleResponse>> create(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long workspaceId,
+            @Valid @RequestBody CreateModuleRequest request
+    ) {
+        ModuleResponse collection = service.create(user, workspaceId, request);
 
-    ApiResponse<ModuleResponse> response = new ApiResponse<>(
-          "Módulo criado com sucesso.",
-          collection
-    );
+        ResponseEnvelope<ModuleResponse> response = new ResponseEnvelope<>(
+                "Módulo criado com sucesso.",
+                collection
+        );
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-  }
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
-  @GetMapping
-  public ResponseEntity<ApiResponse<List<ModuleResponse>>> getAll(
-        @AuthenticationPrincipal User user,
-        @PathVariable Long workspaceId
-  ) {
-    List<ModuleResponse> collections = service.getAll(user, workspaceId);
+    @Operation(
+            summary = "Busca todos os módulos",
+            description = "Busca todos os módulos disponíveis para a área de trabalho"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Módulos recuperados com sucesso."
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Nenhum módulo encontrado."
+            )
+    })
+    @GetMapping
+    public ResponseEntity<ResponseEnvelope<List<ModuleResponse>>> getAll(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long workspaceId
+    ) {
+        List<ModuleResponse> collections = service.getAll(user, workspaceId);
 
-    ApiResponse<List<ModuleResponse>> response = new ApiResponse<>(
-          "Módulos recuperados com sucesso.",
-          collections
-    );
+        ResponseEnvelope<List<ModuleResponse>> response = new ResponseEnvelope<>(
+                "Módulos recuperados com sucesso.",
+                collections
+        );
 
-    return ResponseEntity.ok(response);
-  }
+        return ResponseEntity.ok(response);
+    }
 
-  @GetMapping("/{moduleId}")
-  public ResponseEntity<ApiResponse<ModuleResponse>> get(
-        @AuthenticationPrincipal User user,
-        @PathVariable Long workspaceId,
-        @PathVariable Long moduleId
-  ) {
-    ModuleResponse collection = service.get(user, workspaceId, moduleId);
+    @Operation(
+            summary = "Busca um módulo",
+            description = "Busca um módulo específico pelo seu ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Módulo encontrado com sucesso."
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Nenhum módulo encontrado."
+            )
+    })
+    @GetMapping("/{moduleId}")
+    public ResponseEntity<ResponseEnvelope<ModuleResponse>> get(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long workspaceId,
+            @PathVariable Long moduleId
+    ) {
+        ModuleResponse collection = service.get(user, workspaceId, moduleId);
 
-    ApiResponse<ModuleResponse> response = new ApiResponse<>(
-          "Módulo encontrado com sucesso.",
-          collection
-    );
+        ResponseEnvelope<ModuleResponse> response = new ResponseEnvelope<>(
+                "Módulo encontrado com sucesso.",
+                collection
+        );
 
-    return ResponseEntity.ok(response);
-  }
+        return ResponseEntity.ok(response);
+    }
 
-  @PatchMapping("/{moduleId}")
-  public ResponseEntity<ApiResponse<ModuleResponse>> update(
-        @AuthenticationPrincipal User user,
-        @PathVariable Long workspaceId,
-        @PathVariable Long moduleId,
-        @RequestBody UpdateModuleRequest request
-  ) {
-    ModuleResponse collection = service.update(
-          user,
-          workspaceId,
-          moduleId,
-          request
-    );
+    @Operation(
+            summary = "Atualiza informações de um módulo",
+            description = "Atualiza informações de um módulo pelo seu ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Módulo atualizado com sucesso."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Módulo não encontrado."
+            )
+    })
+    @PatchMapping("/{moduleId}")
+    public ResponseEntity<ResponseEnvelope<ModuleResponse>> update(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long workspaceId,
+            @PathVariable Long moduleId,
+            @Valid @RequestBody UpdateModuleRequest request
+    ) {
+        ModuleResponse collection = service.update(
+                user,
+                workspaceId,
+                moduleId,
+                request
+        );
 
-    ApiResponse<ModuleResponse> response = new ApiResponse<>(
-          "Módulo atualizado com sucesso.",
-          collection
-    );
+        ResponseEnvelope<ModuleResponse> response = new ResponseEnvelope<>(
+                "Módulo atualizado com sucesso.",
+                collection
+        );
 
-    return ResponseEntity.ok(response);
-  }
+        return ResponseEntity.ok(response);
+    }
 
-  @DeleteMapping("/{moduleId}")
-  public ResponseEntity<Void> delete(
-        @AuthenticationPrincipal User user,
-        @PathVariable Long workspaceId,
-        @PathVariable Long moduleId
-  ) {
-    service.delete(user, workspaceId, moduleId);
+    @Operation(
+            summary = "Deleta um módulo",
+            description = "Deleta um módulo pelo seu ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Módulo deletado com sucesso."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Módulo não encontrado."
+            )
+    })
+    @DeleteMapping("/{moduleId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long workspaceId,
+            @PathVariable Long moduleId
+    ) {
+        service.delete(user, workspaceId, moduleId);
 
-    return ResponseEntity.noContent().build();
-  }
+        return ResponseEntity.noContent().build();
+    }
 
 }

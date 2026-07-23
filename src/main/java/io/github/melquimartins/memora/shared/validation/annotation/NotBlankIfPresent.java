@@ -11,17 +11,17 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-      ElementType.FIELD,
-      ElementType.PARAMETER,
-      ElementType.RECORD_COMPONENT
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.RECORD_COMPONENT
 })
 @Constraint(validatedBy = NotBlankIfPresentValidator.class)
 public @interface NotBlankIfPresent {
 
-  String message() default "O campo não pode conter apenas espaços.";
+    String message() default "O campo não pode conter apenas espaços.";
 
-  Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-  Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }
