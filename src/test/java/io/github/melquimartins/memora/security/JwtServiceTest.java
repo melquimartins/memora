@@ -24,7 +24,7 @@ class JwtServiceTest {
     @Test
     @DisplayName("Deve gerar um token JWT válido com sucesso")
     void shouldGenerateTokenSuccessfully() {
-        String subject = "melqui@gmail.com";
+        String subject = "usuario@email.com";
         Instant expiration = Instant.now().plus(1, ChronoUnit.HOURS);
 
         String token = service.generateToken(subject, expiration);
@@ -36,7 +36,7 @@ class JwtServiceTest {
     @Test
     @DisplayName("Deve validar um token JWT e extrair o subject com sucesso")
     void shouldValidateTokenAndReturnSubjectSuccessfully() {
-        String subject = "melqui@gmail.com";
+        String subject = "usuario@email.com";
         Instant expiration = Instant.now().plus(1, ChronoUnit.HOURS);
         String token = service.generateToken(subject, expiration);
 
@@ -66,7 +66,7 @@ class JwtServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao validar um token expirado")
     void shouldThrowExceptionWhenTokenIsExpired() {
-        String subject = "melqui@gmail.com";
+        String subject = "usuario@email.com";
         Instant expiration = Instant.now().minus(1, ChronoUnit.HOURS);
         String expiredToken = service.generateToken(subject, expiration);
 

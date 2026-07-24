@@ -134,8 +134,7 @@ public class ModuleService {
                         "Área de trabalho não encontrada."
                 ));
 
-        long deleted = repository
-                .deleteByIdAndWorkspaceId(collectionId, workspaceId);
+        long deleted = repository.deleteByIdAndWorkspaceId(collectionId, workspaceId);
 
         if (deleted == 0) {
             throw new ResponseStatusException(

@@ -41,7 +41,7 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("Deve criar um desafio com sucesso")
     void shouldCreateChallengeSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -94,7 +94,7 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao criar desafio em módulo inexistente")
     void shouldThrowExceptionWhenModuleNotFoundOnCreate() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -126,7 +126,7 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("Deve buscar todos os desafios com sucesso")
     void shouldGetAllChallengesSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -177,7 +177,7 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("Deve obter um desafio específico por ID com sucesso")
     void shouldGetChallengeByIdSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -228,7 +228,7 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao buscar desafio inexistente")
     void shouldThrowExceptionWhenChallengeNotFoundOnGet() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -267,7 +267,7 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("Deve atualizar um desafio com sucesso")
     void shouldUpdateChallengeSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -323,7 +323,7 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("Deve deletar um desafio com sucesso")
     void shouldDeleteChallengeSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -360,7 +360,7 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao deletar desafio inexistente")
     void shouldThrowExceptionWhenChallengeNotFoundOnDelete() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;

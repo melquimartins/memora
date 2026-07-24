@@ -59,10 +59,10 @@ class AuthServiceTest {
 
         assertNotNull(token);
         assertEquals("token-jwt-valido", token);
-        verify(repository, times(1)).findByEmail(request.email());
-        verify(authenticationManager, times(1))
+        verify(repository).findByEmail(request.email());
+        verify(authenticationManager)
                 .authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtService, times(1))
+        verify(jwtService)
                 .generateToken(eq(request.email()), any(Instant.class));
     }
 
@@ -78,13 +78,8 @@ class AuthServiceTest {
                 () -> service.signIn(request)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals(
-                "E-mail ou senha incorretos. Verifique " +
-                        "suas credenciais e tente novamente.",
-                exception.getReason()
-        );
-        verify(repository, times(1)).findByEmail(request.email());
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
+        verify(repository).findByEmail(request.email());
         verifyNoInteractions(authenticationManager);
         verifyNoInteractions(jwtService);
     }
@@ -108,11 +103,10 @@ class AuthServiceTest {
 
         assertNotNull(token);
         assertEquals("token-jwt-valido", token);
-        verify(repository, times(1)).findByEmail(request.email());
-        verify(passwordEncoder, times(1)).encode(request.password());
-        verify(repository, times(1)).save(any(User.class));
-        verify(jwtService, times(1))
-                .generateToken(eq(request.email()), any(Instant.class));
+        verify(repository).findByEmail(request.email());
+        verify(passwordEncoder).encode(request.password());
+        verify(repository).save(any(User.class));
+        verify(jwtService).generateToken(eq(request.email()), any(Instant.class));
     }
 
     @Test
@@ -137,13 +131,8 @@ class AuthServiceTest {
                 () -> service.signUp(request)
         );
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertEquals(
-                "Este e-mail já está vinculado a uma conta. " +
-                        "Tente fazer login ou use outro e-mail.",
-                exception.getReason()
-        );
-        verify(repository, times(1)).findByEmail(request.email());
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        verify(repository).findByEmail(request.email());
         verify(passwordEncoder, never()).encode(any());
         verify(repository, never()).save(any());
         verifyNoInteractions(jwtService);

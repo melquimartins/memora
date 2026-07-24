@@ -87,16 +87,16 @@ public class WorkspaceService {
         return mapper.toResponse(workspace);
     }
 
-    @Transactional
     public void delete(User user, Long workspaceId) {
-        if (!repository.existsByIdAndUserId(workspaceId, user.getId())) {
+        long deleted = repository.deleteByIdAndUserId(workspaceId, user.getId());
+
+        if (deleted == 0) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Área de trabalho não encontrada."
             );
         }
 
-        repository.deleteByIdAndUserId(workspaceId, user.getId());
     }
 
 }

@@ -42,31 +42,23 @@ class ModuleServiceTest {
     @Test
     @DisplayName("Deve criar um módulo com sucesso")
     void shouldCreateModuleSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
         Workspace workspace = new Workspace("Workspace", "Descrição");
 
-        CreateModuleRequest request = new CreateModuleRequest(
-                "Módulo",
-                "Descrição"
-        );
+        CreateModuleRequest request = new CreateModuleRequest("Módulo", "Descrição");
 
         Module module = new Module(request.title(), request.description());
         module.setWorkspace(workspace);
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId()))
-                .thenReturn(Optional.of(workspace));
+        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
         when(repository.save(any(Module.class))).thenReturn(module);
 
         ModuleResponse expectedResponse = new ModuleResponse(
-                1L,
-                UUID.randomUUID(),
-                module.getTitle(),
-                module.getDescription(),
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                1L, UUID.randomUUID(), module.getTitle(),
+                module.getDescription(), LocalDateTime.now(), LocalDateTime.now()
         );
 
         when(mapper.toResponse(any(Module.class))).thenReturn(expectedResponse);
@@ -76,28 +68,21 @@ class ModuleServiceTest {
         assertNotNull(response);
         assertEquals(1L, response.id());
         assertEquals("Módulo", response.title());
-        verify(workspaceRepository, times(1))
-                .findByIdAndUserId(workspaceId, user.getId());
-        verify(repository, times(1)).save(any(Module.class));
-        verify(mapper, times(1)).toResponse(any(Module.class));
+        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).save(any(Module.class));
+        verify(mapper).toResponse(any(Module.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao criar módulo em workspace inexistente")
     void shouldThrowExceptionWhenWorkspaceNotFoundOnCreate() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
-        CreateModuleRequest request = new CreateModuleRequest(
-                "Módulo",
-                "Descrição"
-        );
+        CreateModuleRequest request = new CreateModuleRequest("Módulo", "Descrição");
 
-        when(workspaceRepository.findByIdAndUserId(
-                workspaceId,
-                user.getId()
-        )).thenReturn(Optional.empty());
+        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -105,15 +90,14 @@ class ModuleServiceTest {
         );
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(workspaceRepository, times(1))
-                .findByIdAndUserId(workspaceId, user.getId());
+        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
         verifyNoInteractions(repository);
     }
 
     @Test
     @DisplayName("Deve buscar todos os módulos com sucesso")
     void shouldGetAllModulesSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -122,17 +106,12 @@ class ModuleServiceTest {
         Module m1 = new Module("Módulo 1", "Descrição 1");
         List<Module> modules = List.of(m1);
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId()))
-                .thenReturn(Optional.of(workspace));
+        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
         when(repository.findAllByWorkspaceId(workspaceId)).thenReturn(modules);
 
         ModuleResponse r1 = new ModuleResponse(
-                1L,
-                UUID.randomUUID(),
-                m1.getTitle(),
-                m1.getDescription(),
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                1L, UUID.randomUUID(), m1.getTitle(), m1.getDescription(),
+                LocalDateTime.now(), LocalDateTime.now()
         );
         List<ModuleResponse> expectedResponses = List.of(r1);
 
@@ -143,16 +122,15 @@ class ModuleServiceTest {
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals("Módulo 1", response.getFirst().title());
-        verify(workspaceRepository, times(1))
-                .findByIdAndUserId(workspaceId, user.getId());
-        verify(repository, times(1)).findAllByWorkspaceId(workspaceId);
-        verify(mapper, times(1)).toResponseList(modules);
+        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).findAllByWorkspaceId(workspaceId);
+        verify(mapper).toResponseList(modules);
     }
 
     @Test
     @DisplayName("Deve obter um módulo específico por ID com sucesso")
     void shouldGetModuleByIdSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -161,21 +139,11 @@ class ModuleServiceTest {
         Long moduleId = 20L;
         Module module = new Module("Módulo", "Descrição");
 
-        when(workspaceRepository.findByIdAndUserId(
-                workspaceId,
-                user.getId()
-        )).thenReturn(Optional.of(workspace));
-        when(repository.findByIdAndWorkspaceId(
-                moduleId,
-                workspaceId
-        )).thenReturn(Optional.of(module));
+        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
+        when(repository.findByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(Optional.of(module));
 
         ModuleResponse expectedResponse = new ModuleResponse(
-                moduleId,
-                UUID.randomUUID(),
-                module.getTitle(),
-                module.getDescription(),
-                LocalDateTime.now(),
+                moduleId, UUID.randomUUID(), module.getTitle(), module.getDescription(), LocalDateTime.now(),
                 LocalDateTime.now()
         );
 
@@ -185,16 +153,15 @@ class ModuleServiceTest {
 
         assertNotNull(response);
         assertEquals(moduleId, response.id());
-        verify(workspaceRepository, times(1))
-                .findByIdAndUserId(workspaceId, user.getId());
-        verify(repository, times(1)).findByIdAndWorkspaceId(moduleId, workspaceId);
-        verify(mapper, times(1)).toResponse(module);
+        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).findByIdAndWorkspaceId(moduleId, workspaceId);
+        verify(mapper).toResponse(module);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao buscar módulo inexistente")
     void shouldThrowExceptionWhenModuleNotFoundOnGet() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -202,14 +169,8 @@ class ModuleServiceTest {
 
         Long moduleId = 20L;
 
-        when(workspaceRepository.findByIdAndUserId(
-                workspaceId,
-                user.getId()
-        )).thenReturn(Optional.of(workspace));
-        when(repository.findByIdAndWorkspaceId(
-                moduleId,
-                workspaceId
-        )).thenReturn(Optional.empty());
+        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
+        when(repository.findByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -218,15 +179,14 @@ class ModuleServiceTest {
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("Módulo não encontrado.", exception.getReason());
-        verify(workspaceRepository, times(1)).
-                findByIdAndUserId(workspaceId, user.getId());
-        verify(repository, times(1)).findByIdAndWorkspaceId(moduleId, workspaceId);
+        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).findByIdAndWorkspaceId(moduleId, workspaceId);
     }
 
     @Test
     @DisplayName("Deve atualizar um módulo com sucesso")
     void shouldUpdateModuleSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -235,48 +195,33 @@ class ModuleServiceTest {
         Long moduleId = 20L;
         Module module = new Module("Módulo Antigo", "Descrição Antiga");
 
-        UpdateModuleRequest request = new UpdateModuleRequest(
-                "Módulo Novo",
-                "Descrição Nova"
-        );
+        UpdateModuleRequest request = new UpdateModuleRequest("Módulo Novo", "Descrição Nova");
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId()))
-                .thenReturn(Optional.of(workspace));
-        when(repository.findByIdAndWorkspaceId(moduleId, workspaceId))
-                .thenReturn(Optional.of(module));
+        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
+        when(repository.findByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(Optional.of(module));
         when(repository.save(module)).thenReturn(module);
 
         ModuleResponse expectedResponse = new ModuleResponse(
-                moduleId,
-                UUID.randomUUID(),
-                request.title(),
-                request.description(),
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                moduleId, UUID.randomUUID(), request.title(),
+                request.description(), LocalDateTime.now(), LocalDateTime.now()
         );
 
         when(mapper.toResponse(module)).thenReturn(expectedResponse);
 
-        ModuleResponse response = service.update(
-                user,
-                workspaceId,
-                moduleId,
-                request
-        );
+        ModuleResponse response = service.update(user, workspaceId, moduleId, request);
 
         assertNotNull(response);
         assertEquals("Módulo Novo", response.title());
-        verify(workspaceRepository, times(1))
-                .findByIdAndUserId(workspaceId, user.getId());
-        verify(repository, times(1)).findByIdAndWorkspaceId(moduleId, workspaceId);
-        verify(repository, times(1)).save(module);
-        verify(mapper, times(1)).toResponse(module);
+        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).findByIdAndWorkspaceId(moduleId, workspaceId);
+        verify(repository).save(module);
+        verify(mapper).toResponse(module);
     }
 
     @Test
     @DisplayName("Deve deletar um módulo com sucesso")
     void shouldDeleteModuleSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -284,23 +229,19 @@ class ModuleServiceTest {
 
         Long moduleId = 20L;
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId()))
-                .thenReturn(Optional.of(workspace));
-        when(repository.deleteByIdAndWorkspaceId(moduleId, workspaceId))
-                .thenReturn(1L);
+        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
+        when(repository.deleteByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(1L);
 
         assertDoesNotThrow(() -> service.delete(user, workspaceId, moduleId));
 
-        verify(workspaceRepository, times(1))
-                .findByIdAndUserId(workspaceId, user.getId());
-        verify(repository, times(1))
-                .deleteByIdAndWorkspaceId(moduleId, workspaceId);
+        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).deleteByIdAndWorkspaceId(moduleId, workspaceId);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao deletar módulo inexistente")
     void shouldThrowExceptionWhenModuleNotFoundOnDelete() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -308,10 +249,8 @@ class ModuleServiceTest {
 
         Long moduleId = 20L;
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId()))
-                .thenReturn(Optional.of(workspace));
-        when(repository.deleteByIdAndWorkspaceId(moduleId, workspaceId))
-                .thenReturn(0L);
+        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
+        when(repository.deleteByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(0L);
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -319,10 +258,8 @@ class ModuleServiceTest {
         );
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(workspaceRepository, times(1))
-                .findByIdAndUserId(workspaceId, user.getId());
-        verify(repository, times(1))
-                .deleteByIdAndWorkspaceId(moduleId, workspaceId);
+        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).deleteByIdAndWorkspaceId(moduleId, workspaceId);
     }
 
 }

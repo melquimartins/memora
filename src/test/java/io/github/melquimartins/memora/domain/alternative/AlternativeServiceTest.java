@@ -41,7 +41,7 @@ class AlternativeServiceTest {
     @Test
     @DisplayName("Deve criar uma alternativa com sucesso")
     void shouldCreateAlternativeSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -92,21 +92,21 @@ class AlternativeServiceTest {
         assertNotNull(response);
         assertEquals(1L, response.id());
         assertTrue(response.correct());
-        verify(challengeRepository, times(1))
+        verify(challengeRepository)
                 .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
                 );
-        verify(repository, times(1)).save(any(Alternative.class));
-        verify(mapper, times(1)).toResponse(any(Alternative.class));
+        verify(repository).save(any(Alternative.class));
+        verify(mapper).toResponse(any(Alternative.class));
     }
 
     @Test
     @DisplayName("Deve buscar todas as alternativas com sucesso")
     void shouldGetAllAlternativesSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -149,21 +149,21 @@ class AlternativeServiceTest {
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals("Alternativa 1", response.getFirst().text());
-        verify(challengeRepository, times(1))
+        verify(challengeRepository)
                 .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
                 );
-        verify(repository, times(1)).findAllByChallengeId(challengeId);
-        verify(mapper, times(1)).toResponseList(alternatives);
+        verify(repository).findAllByChallengeId(challengeId);
+        verify(mapper).toResponseList(alternatives);
     }
 
     @Test
     @DisplayName("Deve obter uma alternativa por ID com sucesso")
     void shouldGetAlternativeByIdSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -206,22 +206,22 @@ class AlternativeServiceTest {
 
         assertNotNull(response);
         assertEquals(alternativeId, response.id());
-        verify(challengeRepository, times(1))
+        verify(challengeRepository)
                 .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
                 );
-        verify(repository, times(1))
+        verify(repository)
                 .findByIdAndChallengeId(alternativeId, challengeId);
-        verify(mapper, times(1)).toResponse(alternative);
+        verify(mapper).toResponse(alternative);
     }
 
     @Test
     @DisplayName("Deve atualizar uma alternativa com sucesso")
     void shouldUpdateAlternativeSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -272,23 +272,23 @@ class AlternativeServiceTest {
         assertNotNull(response);
         assertEquals("Alternativa Nova", response.text());
         assertTrue(response.correct());
-        verify(challengeRepository, times(1))
+        verify(challengeRepository)
                 .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
                 );
-        verify(repository, times(1))
+        verify(repository)
                 .findByIdAndChallengeId(alternativeId, challengeId);
-        verify(repository, times(1)).save(alternative);
-        verify(mapper, times(1)).toResponse(alternative);
+        verify(repository).save(alternative);
+        verify(mapper).toResponse(alternative);
     }
 
     @Test
     @DisplayName("Deve deletar uma alternativa com sucesso")
     void shouldDeleteAlternativeSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -318,21 +318,21 @@ class AlternativeServiceTest {
                 alternativeId
         ));
 
-        verify(challengeRepository, times(1))
+        verify(challengeRepository)
                 .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
                 );
-        verify(repository, times(1))
+        verify(repository)
                 .deleteByIdAndChallengeId(alternativeId, challengeId);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao deletar alternativa inexistente")
     void shouldThrowExceptionWhenAlternativeNotFoundOnDelete() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -366,14 +366,14 @@ class AlternativeServiceTest {
         );
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(challengeRepository, times(1))
+        verify(challengeRepository)
                 .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
                 );
-        verify(repository, times(1))
+        verify(repository)
                 .deleteByIdAndChallengeId(alternativeId, challengeId);
     }
 

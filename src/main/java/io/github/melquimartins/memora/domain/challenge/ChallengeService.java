@@ -139,15 +139,12 @@ public class ChallengeService {
             Long moduleId,
             Long challengeId
     ) {
-        moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                )
-                .orElseThrow(() -> new ResponseStatusException(
+        moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId()).orElseThrow(
+                () -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Módulo não encontrado."
-                ));
+                )
+        );
 
         long deleted = repository.deleteByIdAndModuleId(challengeId, moduleId);
 

@@ -37,7 +37,7 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("Deve criar um workspace com sucesso")
     void shouldCreateWorkspaceSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         CreateWorkspaceRequest request = new CreateWorkspaceRequest(
@@ -70,14 +70,14 @@ class WorkspaceServiceTest {
         assertEquals(1L, response.id());
         assertNotNull(response.uuid());
         assertEquals("Workspace", response.title());
-        verify(repository, times(1)).save(any(Workspace.class));
-        verify(mapper, times(1)).toResponse(any(Workspace.class));
+        verify(repository).save(any(Workspace.class));
+        verify(mapper).toResponse(any(Workspace.class));
     }
 
     @Test
     @DisplayName("Deve buscar todos os workspaces de um usuário")
     void shouldGetAllWorkspacesSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Workspace w1 = new Workspace("Workspace 1", "Descrição 1");
@@ -110,14 +110,14 @@ class WorkspaceServiceTest {
         assertNotNull(response);
         assertEquals(2, response.size());
         assertEquals("Workspace 1", response.getFirst().title());
-        verify(repository, times(1)).findAllByUserId(user.getId());
-        verify(mapper, times(1)).toResponseList(workspaces);
+        verify(repository).findAllByUserId(user.getId());
+        verify(mapper).toResponseList(workspaces);
     }
 
     @Test
     @DisplayName("Deve obter um workspace específico por ID com sucesso")
     void shouldGetWorkspaceByIdSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -141,14 +141,14 @@ class WorkspaceServiceTest {
 
         assertNotNull(response);
         assertEquals(workspaceId, response.id());
-        verify(repository, times(1)).findByIdAndUserId(workspaceId, user.getId());
-        verify(mapper, times(1)).toResponse(workspace);
+        verify(repository).findByIdAndUserId(workspaceId, user.getId());
+        verify(mapper).toResponse(workspace);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao buscar workspace por ID inexistente")
     void shouldThrowExceptionWhenWorkspaceNotFoundOnGet() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -163,14 +163,14 @@ class WorkspaceServiceTest {
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("Área de trabalho não encontrada.", exception.getReason());
-        verify(repository, times(1)).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).findByIdAndUserId(workspaceId, user.getId());
         verifyNoInteractions(mapper);
     }
 
     @Test
     @DisplayName("Deve atualizar um workspace com sucesso")
     void shouldUpdateWorkspaceSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -201,15 +201,15 @@ class WorkspaceServiceTest {
         assertNotNull(response);
         assertEquals("Novo Titulo", response.title());
         assertEquals("Nova Descrição", response.description());
-        verify(repository, times(1)).findByIdAndUserId(workspaceId, user.getId());
-        verify(repository, times(1)).save(workspace);
-        verify(mapper, times(1)).toResponse(workspace);
+        verify(repository).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).save(workspace);
+        verify(mapper).toResponse(workspace);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao atualizar workspace inexistente")
     void shouldThrowExceptionWhenWorkspaceNotFoundOnUpdate() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
@@ -228,41 +228,39 @@ class WorkspaceServiceTest {
         );
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(repository, times(1)).findByIdAndUserId(workspaceId, user.getId());
+        verify(repository).findByIdAndUserId(workspaceId, user.getId());
         verify(repository, never()).save(any());
     }
 
     @Test
     @DisplayName("Deve deletar um workspace com sucesso")
     void shouldDeleteWorkspaceSuccessfully() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
 
-        when(repository.deleteByIdAndUserId(workspaceId, user.getId()))
-                .thenReturn(1L);
+        when(repository.deleteByIdAndUserId(workspaceId, user.getId())).thenReturn(1L);
+
         assertDoesNotThrow(() -> service.delete(user, workspaceId));
-        verify(repository, times(1))
-                .deleteByIdAndUserId(workspaceId, user.getId());
+        verify(repository).deleteByIdAndUserId(workspaceId, user.getId());
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao deletar workspace inexistente")
     void shouldThrowExceptionWhenWorkspaceNotFoundOnDelete() {
-        User user = new User("Melqui Martins", "melqui@gmail.com", "123Abcd@");
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
         user.setId(1L);
 
         Long workspaceId = 10L;
 
-        when(repository.deleteByIdAndUserId(workspaceId, user.getId()))
-                .thenReturn(0L);
+        when(repository.deleteByIdAndUserId(workspaceId, user.getId())).thenReturn(0L);
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class, () -> service.delete(user, workspaceId)
         );
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(repository, times(1)).deleteByIdAndUserId(workspaceId, user.getId());
+        verify(repository).deleteByIdAndUserId(workspaceId, user.getId());
     }
 
 }
