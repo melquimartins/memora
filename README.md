@@ -159,12 +159,6 @@ Para rodar todos os testes unitários:
 
 ---
 
-## 📝 Licença
-
-Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
 <p align="center">
   Desenvolvido por <a href="https://github.com/melquimartins">Melquisedeque Martins</a>
 </p>
