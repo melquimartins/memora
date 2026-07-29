@@ -166,7 +166,7 @@ public class ModuleController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "204",
+                    responseCode = "200",
                     description = "Módulo deletado com sucesso."
             ),
             @ApiResponse(
@@ -175,14 +175,14 @@ public class ModuleController {
             )
     })
     @DeleteMapping("/{moduleId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<String> delete(
             @AuthenticationPrincipal User user,
             @PathVariable Long workspaceId,
             @PathVariable Long moduleId
     ) {
         service.delete(user, workspaceId, moduleId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body("Módulo deletado com sucesso.");
     }
 
 }

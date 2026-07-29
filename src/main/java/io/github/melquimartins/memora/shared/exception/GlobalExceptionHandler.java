@@ -44,17 +44,27 @@ public class GlobalExceptionHandler {
 
         e.getBindingResult().getFieldErrors().forEach(error -> {
             errors.put(error.getField(), error.getDefaultMessage());
-        });
+        })
+        ;
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(errors);
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<String> handleAccessDeniedException() {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body("Você não tem permissão para acessar este recurso.");
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ResponseEntity<String> handleInternalServerErrorException(InternalServerErrorException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+
 }

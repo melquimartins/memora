@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:15
-    container_name: postgres-db
+    container_name: postgres-db-memora
     restart: unless-stopped
     environment:
       POSTGRES_DB: memora_db
@@ -9,7 +9,6 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
-
   app:
     build: .
     container_name: spring-boot-memora

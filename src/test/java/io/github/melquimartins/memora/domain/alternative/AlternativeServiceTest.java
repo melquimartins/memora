@@ -7,14 +7,13 @@ import io.github.melquimartins.memora.domain.alternative.mapper.AlternativeMappe
 import io.github.melquimartins.memora.domain.challenge.Challenge;
 import io.github.melquimartins.memora.domain.challenge.ChallengeRepository;
 import io.github.melquimartins.memora.domain.user.User;
+import io.github.melquimartins.memora.shared.exception.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -114,19 +113,16 @@ class AlternativeServiceTest {
         Long moduleId = 20L;
 
         Long challengeId = 30L;
-        Challenge challenge = new Challenge("Desafio");
 
         Alternative a1 = new Alternative("Alternativa 1", true);
         List<Alternative> alternatives = List.of(a1);
 
-        when(challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                )).thenReturn(Optional.of(challenge));
-        when(repository.findAllByChallengeId(challengeId)).thenReturn(alternatives);
+        when(repository.findAllByChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        )).thenReturn(Optional.of(alternatives));
 
         AlternativeResponse r1 = new AlternativeResponse(
                 1L,
@@ -149,14 +145,12 @@ class AlternativeServiceTest {
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals("Alternativa 1", response.getFirst().text());
-        verify(challengeRepository)
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository).findAllByChallengeId(challengeId);
+        verify(repository).findAllByChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
         verify(mapper).toResponseList(alternatives);
     }
 
@@ -171,20 +165,17 @@ class AlternativeServiceTest {
         Long moduleId = 20L;
 
         Long challengeId = 30L;
-        Challenge challenge = new Challenge("Desafio");
 
         Long alternativeId = 40L;
         Alternative alternative = new Alternative("Alternativa", true);
 
-        when(challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                )).thenReturn(Optional.of(challenge));
-        when(repository.findByIdAndChallengeId(alternativeId, challengeId))
-                .thenReturn(Optional.of(alternative));
+        when(repository.findByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                alternativeId,
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        )).thenReturn(Optional.of(alternative));
 
         AlternativeResponse expectedResponse = new AlternativeResponse(
                 alternativeId,
@@ -206,15 +197,13 @@ class AlternativeServiceTest {
 
         assertNotNull(response);
         assertEquals(alternativeId, response.id());
-        verify(challengeRepository)
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository)
-                .findByIdAndChallengeId(alternativeId, challengeId);
+        verify(repository).findByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                alternativeId,
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
         verify(mapper).toResponse(alternative);
     }
 
@@ -229,7 +218,6 @@ class AlternativeServiceTest {
         Long moduleId = 20L;
 
         Long challengeId = 30L;
-        Challenge challenge = new Challenge("Desafio");
 
         Long alternativeId = 40L;
         Alternative alternative = new Alternative("Alternativa Antiga", false);
@@ -239,15 +227,13 @@ class AlternativeServiceTest {
                 true
         );
 
-        when(challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                )).thenReturn(Optional.of(challenge));
-        when(repository.findByIdAndChallengeId(alternativeId, challengeId))
-                .thenReturn(Optional.of(alternative));
+        when(repository.findByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                alternativeId,
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        )).thenReturn(Optional.of(alternative));
         when(repository.save(alternative)).thenReturn(alternative);
 
         AlternativeResponse expectedResponse = new AlternativeResponse(
@@ -272,15 +258,13 @@ class AlternativeServiceTest {
         assertNotNull(response);
         assertEquals("Alternativa Nova", response.text());
         assertTrue(response.correct());
-        verify(challengeRepository)
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository)
-                .findByIdAndChallengeId(alternativeId, challengeId);
+        verify(repository).findByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                alternativeId,
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
         verify(repository).save(alternative);
         verify(mapper).toResponse(alternative);
     }
@@ -296,19 +280,16 @@ class AlternativeServiceTest {
         Long moduleId = 20L;
 
         Long challengeId = 30L;
-        Challenge challenge = new Challenge("Desafio");
 
         Long alternativeId = 40L;
 
-        when(challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                )).thenReturn(Optional.of(challenge));
-        when(repository.deleteByIdAndChallengeId(alternativeId, challengeId))
-                .thenReturn(1L);
+        when(repository.deleteByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                alternativeId,
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        )).thenReturn(1L);
 
         assertDoesNotThrow(() -> service.delete(
                 user,
@@ -318,15 +299,13 @@ class AlternativeServiceTest {
                 alternativeId
         ));
 
-        verify(challengeRepository)
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository)
-                .deleteByIdAndChallengeId(alternativeId, challengeId);
+        verify(repository).deleteByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                alternativeId,
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
     }
 
     @Test
@@ -340,22 +319,19 @@ class AlternativeServiceTest {
         Long moduleId = 20L;
 
         Long challengeId = 30L;
-        Challenge challenge = new Challenge("Desafio");
 
         Long alternativeId = 40L;
 
-        when(challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                )).thenReturn(Optional.of(challenge));
-        when(repository.deleteByIdAndChallengeId(alternativeId, challengeId))
-                .thenReturn(0L);
+        when(repository.deleteByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                alternativeId,
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        )).thenReturn(0L);
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.delete(
                         user,
                         workspaceId,
@@ -365,16 +341,14 @@ class AlternativeServiceTest {
                 )
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(challengeRepository)
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository)
-                .deleteByIdAndChallengeId(alternativeId, challengeId);
+        assertEquals("Alternativa não encontrada.", exception.getMessage());
+        verify(repository).deleteByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                alternativeId,
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
     }
 
 }

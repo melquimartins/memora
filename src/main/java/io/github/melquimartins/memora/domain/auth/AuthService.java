@@ -5,6 +5,8 @@ import io.github.melquimartins.memora.domain.auth.dto.SignUpRequest;
 import io.github.melquimartins.memora.domain.user.User;
 import io.github.melquimartins.memora.domain.user.UserRepository;
 import io.github.melquimartins.memora.security.JwtService;
+import io.github.melquimartins.memora.shared.exception.ConflictException;
+import io.github.melquimartins.memora.shared.exception.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,31 +37,24 @@ public class AuthService {
     }
 
     public String signIn(SignInRequest request) {
-        User user = repository.findByEmail(request.email()).orElseThrow(() ->
-                new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "E-mail ou senha incorretos. Verifique suas credenciais e tente novamente."
-                )
-        );
+        repository
+                .findByEmail(request.email())
+                .orElseThrow(() -> new UnauthorizedException(
+                        "E-mail ou senha incorretos. Verifique suas credenciais e tente novamente"));
 
         var authenticationToken = new UsernamePasswordAuthenticationToken(
-                user,
-                request.password(),
-                user.getAuthorities()
+                request.email(),
+                request.password()
         );
 
         authenticationManager.authenticate(authenticationToken);
 
-        return jwtService.generateToken(
-                request.email(),
-                generateExpirationTime(7, ChronoUnit.DAYS)
-        );
+        return jwtService.generateToken(request.email(), generateExpirationTime());
     }
 
     public String signUp(SignUpRequest request) {
         if (repository.findByEmail(request.email()).isPresent()) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ConflictException(
                     "Este e-mail já está vinculado a uma conta. Tente fazer login ou use outro e-mail."
             );
         }
@@ -74,14 +69,11 @@ public class AuthService {
 
         repository.save(user);
 
-        return jwtService.generateToken(
-                request.email(),
-                generateExpirationTime(7, ChronoUnit.DAYS)
-        );
+        return jwtService.generateToken(request.email(), generateExpirationTime());
     }
 
-    private Instant generateExpirationTime(int amount, ChronoUnit unit) {
-        return Instant.now().plus(amount, unit);
+    private Instant generateExpirationTime() {
+        return Instant.now().plus(7, ChronoUnit.DAYS);
     }
 
 }

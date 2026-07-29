@@ -22,7 +22,9 @@ import java.util.List;
         description = "Endpoints de gerenciamento de alternativas"
 )
 @RestController
-@RequestMapping("/api/workspaces/{workspaceId}/modules/{moduleId}/challenges/{challengeId}/alternatives")
+@RequestMapping(
+        "/api/workspaces/{workspaceId}/modules/{moduleId}/challenges/{challengeId}/alternatives"
+)
 public class AlternativeController {
 
     private final AlternativeService service;
@@ -193,7 +195,7 @@ public class AlternativeController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "204",
+                    responseCode = "200",
                     description = "Alternativa deletada com sucesso."
             ),
             @ApiResponse(
@@ -202,7 +204,7 @@ public class AlternativeController {
             )
     })
     @DeleteMapping("/{alternativeId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<String> delete(
             @AuthenticationPrincipal User user,
             @PathVariable Long workspaceId,
             @PathVariable Long moduleId,
@@ -217,7 +219,7 @@ public class AlternativeController {
                 alternativeId
         );
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body("Alternativa deletada com sucesso.");
     }
 
 }

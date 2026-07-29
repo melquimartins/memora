@@ -1,5 +1,6 @@
 package io.github.melquimartins.memora.domain.challenge;
 
+import io.github.melquimartins.memora.domain.challenge.dto.AnswerChallengeRequest;
 import io.github.melquimartins.memora.domain.challenge.dto.ChallengeRequest;
 import io.github.melquimartins.memora.domain.challenge.dto.ChallengeResponse;
 import io.github.melquimartins.memora.domain.user.User;
@@ -184,7 +185,7 @@ public class ChallengeController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "204",
+                    responseCode = "200",
                     description = "Desafio deletado com sucesso."
             ),
             @ApiResponse(
@@ -193,7 +194,7 @@ public class ChallengeController {
             )
     })
     @DeleteMapping("/{challengeId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<String> delete(
             @AuthenticationPrincipal User user,
             @PathVariable Long workspaceId,
             @PathVariable Long moduleId,
@@ -206,7 +207,44 @@ public class ChallengeController {
                 challengeId
         );
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body("Desafio deletado com sucesso.");
+    }
+
+    @Operation(
+            summary = "Responde um desafio",
+            description = "Responde um desafio pelo seu ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Desafio respondido com sucesso."
+            ),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "A alternativa selecionada não é a correta."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Alternativa não encontrada."
+            )
+    })
+    @PostMapping("/{challengeId}/answer")
+    public ResponseEntity<String> answer(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long workspaceId,
+            @PathVariable Long moduleId,
+            @PathVariable Long challengeId,
+            @Valid @RequestBody AnswerChallengeRequest request
+    ) {
+        service.answer(
+                user,
+                workspaceId,
+                moduleId,
+                challengeId,
+                request
+        );
+
+        return ResponseEntity.ok("Desafio respondido com sucesso.");
     }
 
 }

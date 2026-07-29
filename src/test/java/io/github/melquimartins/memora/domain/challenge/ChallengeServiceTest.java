@@ -1,21 +1,23 @@
 package io.github.melquimartins.memora.domain.challenge;
 
+import io.github.melquimartins.memora.domain.alternative.Alternative;
+import io.github.melquimartins.memora.domain.alternative.AlternativeRepository;
 import io.github.melquimartins.memora.domain.challenge.dto.ChallengeRequest;
 import io.github.melquimartins.memora.domain.challenge.dto.ChallengeResponse;
 import io.github.melquimartins.memora.domain.challenge.mapper.ChallengeMapper;
 import io.github.melquimartins.memora.domain.module.Module;
 import io.github.melquimartins.memora.domain.module.ModuleRepository;
 import io.github.melquimartins.memora.domain.user.User;
+import io.github.melquimartins.memora.shared.exception.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +30,9 @@ class ChallengeServiceTest {
 
     @Mock
     private ModuleRepository moduleRepository;
+
+    @Mock
+    private AlternativeRepository alternativeRepository;
 
     @Mock
     private ChallengeRepository repository;
@@ -65,6 +70,10 @@ class ChallengeServiceTest {
                 1L,
                 UUID.randomUUID(),
                 challenge.getTitle(),
+                1,
+                new ArrayList<>(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -81,14 +90,14 @@ class ChallengeServiceTest {
         assertNotNull(response);
         assertEquals(1L, response.id());
         assertEquals("Desafio", response.title());
-        verify(moduleRepository, times(1))
+        verify(moduleRepository)
                 .findByIdAndWorkspaceIdAndWorkspaceUserId(
                         moduleId,
                         workspaceId,
                         user.getId()
                 );
-        verify(repository, times(1)).save(any(Challenge.class));
-        verify(mapper, times(1)).toResponse(any(Challenge.class));
+        verify(repository).save(any(Challenge.class));
+        verify(mapper).toResponse(any(Challenge.class));
     }
 
     @Test
@@ -108,13 +117,13 @@ class ChallengeServiceTest {
                 user.getId()
         )).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.create(user, workspaceId, moduleId, request)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(moduleRepository, times(1))
+        assertEquals("Módulo não encontrado.", exception.getMessage());
+        verify(moduleRepository)
                 .findByIdAndWorkspaceIdAndWorkspaceUserId(
                         moduleId,
                         workspaceId,
@@ -132,25 +141,28 @@ class ChallengeServiceTest {
         Long workspaceId = 10L;
 
         Long moduleId = 20L;
-        Module module = new Module("Módulo", "Descrição");
 
         Challenge c1 = new Challenge("Desafio 1");
         List<Challenge> challenges = List.of(c1);
 
-        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(repository.findAllByModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
                 moduleId,
                 workspaceId,
                 user.getId()
-        )).thenReturn(Optional.of(module));
-        when(repository.findAllByModuleId(moduleId)).thenReturn(challenges);
+        )).thenReturn(Optional.of(challenges));
 
         ChallengeResponse r1 = new ChallengeResponse(
                 1L,
                 UUID.randomUUID(),
                 c1.getTitle(),
+                1,
+                new ArrayList<>(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
+
         List<ChallengeResponse> expectedResponses = List.of(r1);
 
         when(mapper.toResponseList(challenges)).thenReturn(expectedResponses);
@@ -164,14 +176,12 @@ class ChallengeServiceTest {
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals("Desafio 1", response.getFirst().title());
-        verify(moduleRepository, times(1))
-                .findByIdAndWorkspaceIdAndWorkspaceUserId(
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository, times(1)).findAllByModuleId(moduleId);
-        verify(mapper, times(1)).toResponseList(challenges);
+        verify(repository).findAllByModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
+        verify(mapper).toResponseList(challenges);
     }
 
     @Test
@@ -183,23 +193,25 @@ class ChallengeServiceTest {
         Long workspaceId = 10L;
 
         Long moduleId = 20L;
-        Module module = new Module("Módulo", "Descrição");
 
         Long challengeId = 30L;
         Challenge challenge = new Challenge("Desafio");
 
-        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(repository.findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
                 moduleId,
                 workspaceId,
                 user.getId()
-        )).thenReturn(Optional.of(module));
-        when(repository.findByIdAndModuleId(challengeId, moduleId))
-                .thenReturn(Optional.of(challenge));
+        )).thenReturn(Optional.of(challenge));
 
         ChallengeResponse expectedResponse = new ChallengeResponse(
                 challengeId,
                 UUID.randomUUID(),
                 challenge.getTitle(),
+                1,
+                new ArrayList<>(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -215,14 +227,13 @@ class ChallengeServiceTest {
 
         assertNotNull(response);
         assertEquals(challengeId, response.id());
-        verify(moduleRepository, times(1))
-                .findByIdAndWorkspaceIdAndWorkspaceUserId(
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
-        verify(mapper, times(1)).toResponse(challenge);
+        verify(repository).findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
+        verify(mapper).toResponse(challenge);
     }
 
     @Test
@@ -234,34 +245,28 @@ class ChallengeServiceTest {
         Long workspaceId = 10L;
 
         Long moduleId = 20L;
-        Module module = new Module("Módulo", "Descrição");
 
         Long challengeId = 30L;
 
-        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(repository.findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
                 moduleId,
                 workspaceId,
                 user.getId()
-        )).thenReturn(Optional.of(module));
-        when(repository.findByIdAndModuleId(
-                challengeId,
-                moduleId
         )).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.get(user, workspaceId, moduleId, challengeId)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals("Desafio não encontrado.", exception.getReason());
-        verify(moduleRepository, times(1))
-                .findByIdAndWorkspaceIdAndWorkspaceUserId(
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
+        assertEquals("Desafio não encontrado.", exception.getMessage());
+        verify(repository).findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
     }
 
     @Test
@@ -273,26 +278,28 @@ class ChallengeServiceTest {
         Long workspaceId = 10L;
 
         Long moduleId = 20L;
-        Module module = new Module("Módulo", "Descrição");
 
         Long challengeId = 30L;
         Challenge challenge = new Challenge("Desafio Antigo");
 
         ChallengeRequest request = new ChallengeRequest("Desafio Novo");
 
-        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(repository.findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
                 moduleId,
                 workspaceId,
                 user.getId()
-        )).thenReturn(Optional.of(module));
-        when(repository.findByIdAndModuleId(challengeId, moduleId))
-                .thenReturn(Optional.of(challenge));
+        )).thenReturn(Optional.of(challenge));
         when(repository.save(challenge)).thenReturn(challenge);
 
         ChallengeResponse expectedResponse = new ChallengeResponse(
                 challengeId,
                 UUID.randomUUID(),
                 request.title(),
+                1,
+                new ArrayList<>(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -309,15 +316,14 @@ class ChallengeServiceTest {
 
         assertNotNull(response);
         assertEquals("Desafio Novo", response.title());
-        verify(moduleRepository, times(1))
-                .findByIdAndWorkspaceIdAndWorkspaceUserId(
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository, times(1)).findByIdAndModuleId(challengeId, moduleId);
-        verify(repository, times(1)).save(challenge);
-        verify(mapper, times(1)).toResponse(challenge);
+        verify(repository).findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
+        verify(repository).save(challenge);
+        verify(mapper).toResponse(challenge);
     }
 
     @Test
@@ -329,32 +335,23 @@ class ChallengeServiceTest {
         Long workspaceId = 10L;
 
         Long moduleId = 20L;
-        Module module = new Module("Módulo", "Descrição");
 
         Long challengeId = 30L;
 
-        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(repository.deleteByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
                 moduleId,
                 workspaceId,
                 user.getId()
-        )).thenReturn(Optional.of(module));
-        when(repository.deleteByIdAndModuleId(challengeId, moduleId)).thenReturn(1L);
+        )).thenReturn(1L);
 
-        assertDoesNotThrow(() -> service.delete(
-                        user,
-                        workspaceId,
-                        moduleId,
-                        challengeId
-                )
+        assertDoesNotThrow(() -> service.delete(user, workspaceId, moduleId, challengeId));
+        verify(repository).deleteByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
         );
-
-        verify(moduleRepository, times(1))
-                .findByIdAndWorkspaceIdAndWorkspaceUserId(
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
-        verify(repository, times(1)).deleteByIdAndModuleId(challengeId, moduleId);
     }
 
     @Test
@@ -366,30 +363,103 @@ class ChallengeServiceTest {
         Long workspaceId = 10L;
 
         Long moduleId = 20L;
-        Module module = new Module("Módulo", "Descrição");
 
         Long challengeId = 30L;
 
-        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(
+        when(repository.deleteByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
                 moduleId,
                 workspaceId,
                 user.getId()
-        )).thenReturn(Optional.of(module));
-        when(repository.deleteByIdAndModuleId(challengeId, moduleId)).thenReturn(0L);
+        )).thenReturn(0L);
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.delete(user, workspaceId, moduleId, challengeId)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(moduleRepository, times(1))
-                .findByIdAndWorkspaceIdAndWorkspaceUserId(
-                        moduleId,
-                        workspaceId,
-                        user.getId()
+        assertEquals("Desafio não encontrado.", exception.getMessage());
+        verify(repository).deleteByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+                challengeId,
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
+    }
+
+    @Test
+    @DisplayName("Deve responder um desafio com sucesso quando a alternativa for correta")
+    void shouldAnswerChallengeSuccessfully() {
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
+        user.setId(1L);
+
+        Long workspaceId = 10L;
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
+
+        Long challengeId = 30L;
+        Challenge challenge = new Challenge("Desafio");
+        challenge.setModule(module);
+
+        Long alternativeId = 40L;
+        Alternative alternative = new Alternative("Alternativa Correta", true);
+
+        io.github.melquimartins.memora.domain.challenge.dto.AnswerChallengeRequest request =
+                new io.github.melquimartins.memora.domain.challenge.dto.AnswerChallengeRequest(
+                        alternativeId,
+                        io.github.melquimartins.memora.domain.challenge.enums.DifficultyLevel.EASY
                 );
-        verify(repository, times(1)).deleteByIdAndModuleId(challengeId, moduleId);
+
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId()))
+                .thenReturn(Optional.of(module));
+        when(repository.findByIdAndModuleId(challengeId, moduleId))
+                .thenReturn(Optional.of(challenge));
+        when(alternativeRepository.findByIdAndChallengeId(alternativeId, challengeId))
+                .thenReturn(Optional.of(alternative));
+        when(repository.save(challenge)).thenReturn(challenge);
+
+        assertDoesNotThrow(() -> service.answer(user, workspaceId, moduleId, challengeId, request));
+
+        verify(repository).save(challenge);
+    }
+
+    @Test
+    @DisplayName("Deve lançar BadRequestException ao responder com alternativa incorreta")
+    void shouldThrowBadRequestExceptionWhenAlternativeIsIncorrectOnAnswer() {
+        User user = new User("Nome do Usuário", "usuario@email.com", "senha123");
+        user.setId(1L);
+
+        Long workspaceId = 10L;
+        Long moduleId = 20L;
+        Module module = new Module("Módulo", "Descrição");
+
+        Long challengeId = 30L;
+        Challenge challenge = new Challenge("Desafio");
+        challenge.setModule(module);
+
+        Long alternativeId = 40L;
+        Alternative alternative = new Alternative("Alternativa Incorreta", false);
+
+        io.github.melquimartins.memora.domain.challenge.dto.AnswerChallengeRequest request =
+                new io.github.melquimartins.memora.domain.challenge.dto.AnswerChallengeRequest(
+                        alternativeId,
+                        io.github.melquimartins.memora.domain.challenge.enums.DifficultyLevel.EASY
+                );
+
+        when(moduleRepository.findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId()))
+                .thenReturn(Optional.of(module));
+        when(repository.findByIdAndModuleId(challengeId, moduleId))
+                .thenReturn(Optional.of(challenge));
+        when(alternativeRepository.findByIdAndChallengeId(alternativeId, challengeId))
+                .thenReturn(Optional.of(alternative));
+
+        io.github.melquimartins.memora.shared.exception.BadRequestException exception = assertThrows(
+                io.github.melquimartins.memora.shared.exception.BadRequestException.class,
+                () -> service.answer(user, workspaceId, moduleId, challengeId, request)
+        );
+
+        assertEquals("A alternativa selecionada não é a correta.", exception.getMessage());
+        verify(repository, never()).save(any());
     }
 
 }

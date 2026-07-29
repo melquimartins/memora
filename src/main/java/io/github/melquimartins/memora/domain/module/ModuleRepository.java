@@ -8,18 +8,13 @@ import java.util.Optional;
 
 @Repository
 public interface ModuleRepository extends JpaRepository<Module, Long> {
-    List<Module> findAllByWorkspaceId(Long workspaceId);
-
-    Optional<Module> findByIdAndWorkspaceId(
-            Long collectionId,
-            Long workspaceId
-    );
+    Optional<List<Module>> findAllByWorkspaceIdAndWorkspaceUserId(Long workspaceId, Long userId);
 
     Optional<Module> findByIdAndWorkspaceIdAndWorkspaceUserId(
-            Long collectionId,
+            Long moduleId,
             Long workspaceId,
             Long userId
     );
 
-    long deleteByIdAndWorkspaceId(Long collectionId, Long workspaceId);
+    long deleteByIdAndWorkspaceIdAndWorkspaceUserId(Long moduleId, Long workspaceId, Long userId);
 }

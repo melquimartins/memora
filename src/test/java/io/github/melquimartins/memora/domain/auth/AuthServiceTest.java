@@ -5,17 +5,17 @@ import io.github.melquimartins.memora.domain.auth.dto.SignUpRequest;
 import io.github.melquimartins.memora.domain.user.User;
 import io.github.melquimartins.memora.domain.user.UserRepository;
 import io.github.melquimartins.memora.security.JwtService;
+import io.github.melquimartins.memora.shared.exception.ConflictException;
+import io.github.melquimartins.memora.shared.exception.UnauthorizedException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -73,12 +73,12 @@ class AuthServiceTest {
 
         when(repository.findByEmail(request.email())).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        UnauthorizedException exception = assertThrows(
+                UnauthorizedException.class,
                 () -> service.signIn(request)
         );
 
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
+        assertNotNull(exception);
         verify(repository).findByEmail(request.email());
         verifyNoInteractions(authenticationManager);
         verifyNoInteractions(jwtService);
@@ -126,12 +126,12 @@ class AuthServiceTest {
         when(repository.findByEmail(request.email()))
                 .thenReturn(Optional.of(existingUser));
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        ConflictException exception = assertThrows(
+                ConflictException.class,
                 () -> service.signUp(request)
         );
 
-        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        assertNotNull(exception);
         verify(repository).findByEmail(request.email());
         verify(passwordEncoder, never()).encode(any());
         verify(repository, never()).save(any());

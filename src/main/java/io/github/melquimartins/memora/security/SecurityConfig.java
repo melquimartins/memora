@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
@@ -29,26 +28,12 @@ public class SecurityConfig {
             HttpSecurity httpSecurity
     ) throws Exception {
         return httpSecurity
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(
-                        session ->
-                                session.sessionCreationPolicy(
-                                        SessionCreationPolicy.STATELESS
-                                )
-                )
-                .addFilterBefore(
-                        securityFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                )
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/auth/sign-in"
-                        ).permitAll()
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/auth/sign-up"
-                        ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -62,9 +47,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration
-    ) {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
         return configuration.getAuthenticationManager();
     }
 

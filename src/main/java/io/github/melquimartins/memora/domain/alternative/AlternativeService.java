@@ -7,6 +7,7 @@ import io.github.melquimartins.memora.domain.alternative.mapper.AlternativeMappe
 import io.github.melquimartins.memora.domain.challenge.Challenge;
 import io.github.melquimartins.memora.domain.challenge.ChallengeRepository;
 import io.github.melquimartins.memora.domain.user.User;
+import io.github.melquimartins.memora.shared.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -44,15 +45,9 @@ public class AlternativeService {
                         workspaceId,
                         user.getId()
                 )
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Desafio não encontrado."
-                ));
+                .orElseThrow(() -> new NotFoundException("Desafio não encontrado."));
 
-        Alternative alternative = new Alternative(
-                request.text(),
-                request.correct()
-        );
+        Alternative alternative = new Alternative(request.text(), request.correct());
 
         alternative.setChallenge(challenge);
 
@@ -67,15 +62,18 @@ public class AlternativeService {
             Long moduleId,
             Long challengeId
     ) {
-        challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
-                        challengeId,
-                        moduleId,
-                        workspaceId,
-                        user.getId()
-                );
 
-        List<Alternative> alternatives = repository.findAllByChallengeId(challengeId);
+        List<Alternative> alternatives =
+                repository
+                        .findAllByChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                                challengeId,
+                                moduleId,
+                                workspaceId,
+                                user.getId()
+                        )
+                        .orElseThrow(() -> new NotFoundException(
+                                "Nenhuma alternativa foi encontrada."));
+        ;
 
         return mapper.toResponseList(alternatives);
     }
@@ -87,24 +85,15 @@ public class AlternativeService {
             Long challengeId,
             Long alternativeId
     ) {
-        challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+        Alternative alternative = repository
+                .findByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                        alternativeId,
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
                 )
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Desafio não encontrado."
-                ));
-
-        Alternative alternative = repository
-                .findByIdAndChallengeId(alternativeId, challengeId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Alternativa não encontrada."
-                ));
+                .orElseThrow(() -> new NotFoundException("Alternativa não encontrada."));
 
         return mapper.toResponse(alternative);
     }
@@ -117,24 +106,15 @@ public class AlternativeService {
             Long alternativeId,
             UpdateAlternativeRequest request
     ) {
-        challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+        Alternative alternative = repository
+                .findByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                        alternativeId,
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
                 )
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Desafio não encontrado."
-                ));
-
-        Alternative alternative = repository
-                .findByIdAndChallengeId(alternativeId, challengeId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Alternativa não encontrada."
-                ));
+                .orElseThrow(() -> new NotFoundException("Alternativa não encontrada."));
 
         if (request.text() != null) {
             alternative.setText(request.text());
@@ -156,26 +136,17 @@ public class AlternativeService {
             Long challengeId,
             Long alternativeId
     ) {
-        challengeRepository
-                .findByIdAndModuleIdAndModuleWorkspaceIdAndModuleWorkspaceUserId(
+        long deleted =
+                repository.deleteByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+                        alternativeId,
                         challengeId,
                         moduleId,
                         workspaceId,
                         user.getId()
-                )
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Desafio não encontrado."
-                ));
-
-        long deleted = repository
-                .deleteByIdAndChallengeId(alternativeId, challengeId);
+                );
 
         if (deleted == 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Alternativa não encontrada."
-            );
+            throw new NotFoundException("Alternativa não encontrada.");
         }
     }
 

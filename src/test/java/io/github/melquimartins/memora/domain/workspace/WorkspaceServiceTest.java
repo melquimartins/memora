@@ -5,14 +5,13 @@ import io.github.melquimartins.memora.domain.workspace.dto.CreateWorkspaceReques
 import io.github.melquimartins.memora.domain.workspace.dto.UpdateWorkspaceRequest;
 import io.github.melquimartins.memora.domain.workspace.dto.WorkspaceResponse;
 import io.github.melquimartins.memora.domain.workspace.mapper.WorkspaceMapper;
+import io.github.melquimartins.memora.shared.exception.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -156,13 +155,12 @@ class WorkspaceServiceTest {
         when(repository.findByIdAndUserId(workspaceId, user.getId()))
                 .thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.get(user, workspaceId)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals("Área de trabalho não encontrada.", exception.getReason());
+        assertEquals("Área de trabalho não encontrada.", exception.getMessage());
         verify(repository).findByIdAndUserId(workspaceId, user.getId());
         verifyNoInteractions(mapper);
     }
@@ -222,12 +220,12 @@ class WorkspaceServiceTest {
         when(repository.findByIdAndUserId(workspaceId, user.getId()))
                 .thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.update(user, workspaceId, request)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Área de trabalho não encontrada.", exception.getMessage());
         verify(repository).findByIdAndUserId(workspaceId, user.getId());
         verify(repository, never()).save(any());
     }
@@ -256,10 +254,10 @@ class WorkspaceServiceTest {
 
         when(repository.deleteByIdAndUserId(workspaceId, user.getId())).thenReturn(0L);
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class, () -> service.delete(user, workspaceId)
+        NotFoundException exception = assertThrows(
+                NotFoundException.class, () -> service.delete(user, workspaceId)
         );
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Área de trabalho não encontrada.", exception.getMessage());
         verify(repository).deleteByIdAndUserId(workspaceId, user.getId());
     }
 

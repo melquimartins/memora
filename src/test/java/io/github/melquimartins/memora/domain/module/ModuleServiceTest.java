@@ -7,14 +7,13 @@ import io.github.melquimartins.memora.domain.module.mapper.ModuleMapper;
 import io.github.melquimartins.memora.domain.user.User;
 import io.github.melquimartins.memora.domain.workspace.Workspace;
 import io.github.melquimartins.memora.domain.workspace.WorkspaceRepository;
+import io.github.melquimartins.memora.shared.exception.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -84,12 +83,12 @@ class ModuleServiceTest {
 
         when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.create(user, workspaceId, request)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Área de trabalho não encontrada.", exception.getMessage());
         verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
         verifyNoInteractions(repository);
     }
@@ -101,13 +100,11 @@ class ModuleServiceTest {
         user.setId(1L);
 
         Long workspaceId = 10L;
-        Workspace workspace = new Workspace("Workspace", "Descrição");
 
         Module m1 = new Module("Módulo 1", "Descrição 1");
         List<Module> modules = List.of(m1);
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
-        when(repository.findAllByWorkspaceId(workspaceId)).thenReturn(modules);
+        when(repository.findAllByWorkspaceIdAndWorkspaceUserId(workspaceId, user.getId())).thenReturn(Optional.of(modules));
 
         ModuleResponse r1 = new ModuleResponse(
                 1L, UUID.randomUUID(), m1.getTitle(), m1.getDescription(),
@@ -122,8 +119,7 @@ class ModuleServiceTest {
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals("Módulo 1", response.getFirst().title());
-        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
-        verify(repository).findAllByWorkspaceId(workspaceId);
+        verify(repository).findAllByWorkspaceIdAndWorkspaceUserId(workspaceId, user.getId());
         verify(mapper).toResponseList(modules);
     }
 
@@ -134,13 +130,10 @@ class ModuleServiceTest {
         user.setId(1L);
 
         Long workspaceId = 10L;
-        Workspace workspace = new Workspace("Workspace", "Descrição");
-
         Long moduleId = 20L;
         Module module = new Module("Módulo", "Descrição");
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
-        when(repository.findByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(Optional.of(module));
+        when(repository.findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId())).thenReturn(Optional.of(module));
 
         ModuleResponse expectedResponse = new ModuleResponse(
                 moduleId, UUID.randomUUID(), module.getTitle(), module.getDescription(), LocalDateTime.now(),
@@ -153,8 +146,7 @@ class ModuleServiceTest {
 
         assertNotNull(response);
         assertEquals(moduleId, response.id());
-        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
-        verify(repository).findByIdAndWorkspaceId(moduleId, workspaceId);
+        verify(repository).findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId());
         verify(mapper).toResponse(module);
     }
 
@@ -165,22 +157,17 @@ class ModuleServiceTest {
         user.setId(1L);
 
         Long workspaceId = 10L;
-        Workspace workspace = new Workspace("Workspace", "Descrição");
-
         Long moduleId = 20L;
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
-        when(repository.findByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(Optional.empty());
+        when(repository.findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId())).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.get(user, workspaceId, moduleId)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals("Módulo não encontrado.", exception.getReason());
-        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
-        verify(repository).findByIdAndWorkspaceId(moduleId, workspaceId);
+        assertEquals("Módulo não encontrado.", exception.getMessage());
+        verify(repository).findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId());
     }
 
     @Test
@@ -190,15 +177,12 @@ class ModuleServiceTest {
         user.setId(1L);
 
         Long workspaceId = 10L;
-        Workspace workspace = new Workspace("Workspace", "Descrição");
-
         Long moduleId = 20L;
         Module module = new Module("Módulo Antigo", "Descrição Antiga");
 
         UpdateModuleRequest request = new UpdateModuleRequest("Módulo Novo", "Descrição Nova");
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
-        when(repository.findByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(Optional.of(module));
+        when(repository.findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId())).thenReturn(Optional.of(module));
         when(repository.save(module)).thenReturn(module);
 
         ModuleResponse expectedResponse = new ModuleResponse(
@@ -212,8 +196,7 @@ class ModuleServiceTest {
 
         assertNotNull(response);
         assertEquals("Módulo Novo", response.title());
-        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
-        verify(repository).findByIdAndWorkspaceId(moduleId, workspaceId);
+        verify(repository).findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId());
         verify(repository).save(module);
         verify(mapper).toResponse(module);
     }
@@ -225,17 +208,13 @@ class ModuleServiceTest {
         user.setId(1L);
 
         Long workspaceId = 10L;
-        Workspace workspace = new Workspace("Workspace", "Descrição");
-
         Long moduleId = 20L;
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
-        when(repository.deleteByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(1L);
+        when(repository.deleteByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId())).thenReturn(1L);
 
         assertDoesNotThrow(() -> service.delete(user, workspaceId, moduleId));
 
-        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
-        verify(repository).deleteByIdAndWorkspaceId(moduleId, workspaceId);
+        verify(repository).deleteByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId());
     }
 
     @Test
@@ -245,21 +224,17 @@ class ModuleServiceTest {
         user.setId(1L);
 
         Long workspaceId = 10L;
-        Workspace workspace = new Workspace("Workspace", "Descrição");
-
         Long moduleId = 20L;
 
-        when(workspaceRepository.findByIdAndUserId(workspaceId, user.getId())).thenReturn(Optional.of(workspace));
-        when(repository.deleteByIdAndWorkspaceId(moduleId, workspaceId)).thenReturn(0L);
+        when(repository.deleteByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId())).thenReturn(0L);
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.delete(user, workspaceId, moduleId)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(workspaceRepository).findByIdAndUserId(workspaceId, user.getId());
-        verify(repository).deleteByIdAndWorkspaceId(moduleId, workspaceId);
+        assertEquals("Módulo não encontrado.", exception.getMessage());
+        verify(repository).deleteByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId());
     }
 
 }

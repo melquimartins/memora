@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -48,13 +49,10 @@ public class SecurityFilter extends OncePerRequestFilter {
                     );
 
                     var authenticationToken = new UsernamePasswordAuthenticationToken(
-                            user,
-                            false,
-                            user.getAuthorities()
+                            user, false, user.getAuthorities()
                     );
 
-                    SecurityContextHolder.getContext()
-                            .setAuthentication(authenticationToken);
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();
@@ -71,13 +69,11 @@ public class SecurityFilter extends OncePerRequestFilter {
             return null;
         }
 
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("token")) {
-                return cookie.getValue();
-            }
-        }
-
-        return null;
+        return Arrays.stream(cookies)
+                .filter(cookie -> "accessToken".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
     }
 
 }

@@ -8,12 +8,28 @@ import java.util.Optional;
 
 @Repository
 public interface AlternativeRepository extends JpaRepository<Alternative, Long> {
-    List<Alternative> findAllByChallengeId(Long challengeId);
-
-    Optional<Alternative> findByIdAndChallengeId(
-            Long alternativeId,
-            Long challengeId
+    Optional<List<Alternative>> findAllByChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+            Long challengeId,
+            Long moduleId,
+            Long workspaceId,
+            Long userId
     );
 
-    long deleteByIdAndChallengeId(Long alternativeId, Long challengeId);
+    Optional<Alternative> findByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+            Long alternativeId,
+            Long challengeId,
+            Long moduleId,
+            Long workspaceId,
+            Long userId
+    );
+
+    Optional<Alternative> findByIdAndChallengeId(Long alternativeId, Long challengeId);
+
+    long deleteByIdAndChallengeIdAndChallengeModuleIdAndChallengeModuleWorkspaceIdAndChallengeModuleWorkspaceUserId(
+            Long alternativeId,
+            Long challengeId,
+            Long moduleId,
+            Long workspaceId,
+            Long userId
+    );
 }

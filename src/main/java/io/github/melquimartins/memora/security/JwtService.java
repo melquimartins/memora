@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import io.github.melquimartins.memora.shared.exception.InternalServerErrorException;
+import io.github.melquimartins.memora.shared.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,10 +31,8 @@ public class JwtService {
                     .withExpiresAt(expirationDate)
                     .sign(algorithm);
         } catch (JWTCreationException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Não foi possível gerar o token de autenticação. Tente novamente mais tarde."
-            );
+            throw new InternalServerErrorException(
+                    "Não foi possível gerar o token de autenticação. Tente novamente mais tarde.");
         }
     }
 
@@ -45,10 +45,7 @@ public class JwtService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "O token de autenticação é inválido ou expirou. Faça login novamente."
-            );
+            throw new UnauthorizedException("O token de autenticação é inválido ou expirou. Faça login novamente.");
         }
     }
 

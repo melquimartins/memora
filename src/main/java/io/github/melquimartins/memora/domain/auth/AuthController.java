@@ -104,7 +104,7 @@ public class AuthController {
     }
 
     private ResponseCookie createTokenCookie(String token) {
-        return ResponseCookie.from("token", token)
+        return ResponseCookie.from("accessToken", token)
                 .httpOnly(true)
                 .secure(false)
                 .path("/")

@@ -7,6 +7,7 @@ import io.github.melquimartins.memora.domain.module.mapper.ModuleMapper;
 import io.github.melquimartins.memora.domain.user.User;
 import io.github.melquimartins.memora.domain.workspace.Workspace;
 import io.github.melquimartins.memora.domain.workspace.WorkspaceRepository;
+import io.github.melquimartins.memora.shared.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,16 +32,9 @@ public class ModuleService {
         this.mapper = mapper;
     }
 
-    public ModuleResponse create(
-            User user,
-            Long workspaceId,
-            CreateModuleRequest request
-    ) {
+    public ModuleResponse create(User user, Long workspaceId, CreateModuleRequest request) {
         Workspace workspace = workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Área de trabalho não encontrada."
-                ));
+                .orElseThrow(() -> new NotFoundException("Área de trabalho não encontrada."));
 
         Module module = new Module(
                 request.title(),
@@ -58,35 +52,17 @@ public class ModuleService {
             User user,
             Long workspaceId
     ) {
-        workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Área de trabalho não encontrada."
-                ));
-
-        List<Module> modules = repository.findAllByWorkspaceId(workspaceId);
+        List<Module> modules = repository
+                .findAllByWorkspaceIdAndWorkspaceUserId(workspaceId, user.getId())
+                .orElseThrow(() -> new NotFoundException("Nenhum módulo foi encontrado."));
 
         return mapper.toResponseList(modules);
     }
 
-    public ModuleResponse get(
-            User user,
-            Long workspaceId,
-            Long collectionId
-    ) {
-        workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Área de trabalho não encontrada."
-                ));
-
-        Module module = repository.findByIdAndWorkspaceId(
-                collectionId,
-                workspaceId
-        ).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "Módulo não encontrado."
-        ));
+    public ModuleResponse get(User user, Long workspaceId, Long moduleId) {
+        Module module = repository
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId())
+                .orElseThrow(() -> new NotFoundException("Módulo não encontrado."));
 
         return mapper.toResponse(module);
     }
@@ -94,21 +70,12 @@ public class ModuleService {
     public ModuleResponse update(
             User user,
             Long workspaceId,
-            Long collectionId,
+            Long moduleId,
             UpdateModuleRequest request
     ) {
-        workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Área de trabalho não encontrada."
-                ));
-
         Module module = repository
-                .findByIdAndWorkspaceId(collectionId, workspaceId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Módulo não encontrado."
-                ));
+                .findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId())
+                .orElseThrow(() -> new NotFoundException("Módulo não encontrado."));
 
         if (request.title() != null) {
             module.setTitle(request.title());
@@ -123,24 +90,15 @@ public class ModuleService {
         return mapper.toResponse(module);
     }
 
-    public void delete(
-            User user,
-            Long workspaceId,
-            Long collectionId
-    ) {
-        workspaceRepository.findByIdAndUserId(workspaceId, user.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Área de trabalho não encontrada."
-                ));
-
-        long deleted = repository.deleteByIdAndWorkspaceId(collectionId, workspaceId);
+    public void delete(User user, Long workspaceId, Long moduleId) {
+        long deleted = repository.deleteByIdAndWorkspaceIdAndWorkspaceUserId(
+                moduleId,
+                workspaceId,
+                user.getId()
+        );
 
         if (deleted == 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Módulo não encontrado."
-            );
+            throw new NotFoundException("Módulo não encontrado.");
         }
     }
 

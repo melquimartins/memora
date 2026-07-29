@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "challenges")
 public class Challenge {
@@ -31,11 +33,12 @@ public class Challenge {
         }
     }
 
-    @Setter
     @Column(nullable = false)
     private String title;
 
-    @Setter
+    @Column(nullable = false, name = "multiplier")
+    private int multiplier = 1;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id", nullable = false)
     private Module module;
@@ -47,11 +50,17 @@ public class Challenge {
     )
     private List<Alternative> alternatives = new ArrayList<>();
 
+    @Column(name = "answered_at")
+    private LocalDateTime answeredAt;
+
+    @Column(name = "available_again_at")
+    private LocalDateTime availableAgainAt;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @CreationTimestamp
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

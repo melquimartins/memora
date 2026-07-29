@@ -40,6 +40,9 @@ public class Module {
     @Setter
     private String description;
 
+    @Column(nullable = false, name = "multiplier")
+    private int multiplier = 1;
+
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id", nullable = false)

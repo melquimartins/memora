@@ -1,5 +1,6 @@
 package io.github.melquimartins.memora.security;
 
+import io.github.melquimartins.memora.shared.exception.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,16 +52,12 @@ class JwtServiceTest {
     void shouldThrowExceptionWhenTokenIsInvalid() {
         String invalidToken = "invalid.token.value";
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        UnauthorizedException exception = assertThrows(
+                UnauthorizedException.class,
                 () -> service.validateToken(invalidToken)
         );
 
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
-        assertEquals(
-                "O token de autenticação é inválido ou expirou. Faça login novamente."
-                , exception.getReason()
-        );
+        assertEquals("O token de autenticação é inválido ou expirou. Faça login novamente.", exception.getMessage());
     }
 
     @Test
@@ -70,12 +67,12 @@ class JwtServiceTest {
         Instant expiration = Instant.now().minus(1, ChronoUnit.HOURS);
         String expiredToken = service.generateToken(subject, expiration);
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        UnauthorizedException exception = assertThrows(
+                UnauthorizedException.class,
                 () -> service.validateToken(expiredToken)
         );
 
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
+        assertEquals("O token de autenticação é inválido ou expirou. Faça login novamente.", exception.getMessage());
     }
 
 }

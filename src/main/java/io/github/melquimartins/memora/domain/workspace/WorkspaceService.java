@@ -5,6 +5,7 @@ import io.github.melquimartins.memora.domain.workspace.dto.UpdateWorkspaceReques
 import io.github.melquimartins.memora.domain.user.User;
 import io.github.melquimartins.memora.domain.workspace.dto.WorkspaceResponse;
 import io.github.melquimartins.memora.domain.workspace.mapper.WorkspaceMapper;
+import io.github.melquimartins.memora.shared.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,10 +28,7 @@ public class WorkspaceService {
     }
 
     public WorkspaceResponse create(User user, CreateWorkspaceRequest request) {
-        Workspace workspace = new Workspace(
-                request.title(),
-                request.description()
-        );
+        Workspace workspace = new Workspace(request.title(), request.description());
         workspace.setUser(user);
 
         repository.save(workspace);
@@ -42,37 +40,23 @@ public class WorkspaceService {
         List<Workspace> workspaces = repository.findAllByUserId(user.getId());
 
         if (workspaces.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Nenhuma área de trabalho encontrada."
-            );
+            throw new NotFoundException("Nenhuma área de trabalho encontrada.");
         }
 
         return mapper.toResponseList(workspaces);
     }
 
     public WorkspaceResponse get(User user, Long workspaceId) {
-        Workspace workspace = repository
-                .findByIdAndUserId(workspaceId, user.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Área de trabalho não encontrada."
-                ));
+        Workspace workspace = repository.findByIdAndUserId(workspaceId, user.getId())
+                .orElseThrow(() -> new NotFoundException("Área de trabalho não encontrada."));
 
         return mapper.toResponse(workspace);
     }
 
-    public WorkspaceResponse update(
-            User user,
-            Long workspaceId,
-            UpdateWorkspaceRequest request
-    ) {
+    public WorkspaceResponse update(User user, Long workspaceId, UpdateWorkspaceRequest request) {
         Workspace workspace = repository
                 .findByIdAndUserId(workspaceId, user.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Área de trabalho não encontrada."
-                ));
+                .orElseThrow(() -> new NotFoundException("Área de trabalho não encontrada."));
 
         if (request.title() != null) {
             workspace.setTitle(request.title());
@@ -91,12 +75,8 @@ public class WorkspaceService {
         long deleted = repository.deleteByIdAndUserId(workspaceId, user.getId());
 
         if (deleted == 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Área de trabalho não encontrada."
-            );
+            throw new NotFoundException("Área de trabalho não encontrada.");
         }
-
     }
 
 }
