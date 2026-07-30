@@ -9,6 +9,10 @@
 
 ---
 
+> ⚠️ Projeto em desenvolvimento contínuo. Novas adições, ajustes e melhorias são adicionados aos poucos através de commits.
+
+---
+
 ## Sobre o Projeto
 
 O **Memora** é uma API RESTful de alta performance desenvolvida para otimizar o processo de retenção de conhecimento através do método de **Repetição Espaçada** (*Spaced Repetition System - SRS*). 
