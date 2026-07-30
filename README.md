@@ -1,4 +1,4 @@
-<h1>🧠 Memora API</h1>
+# Memora API
 
 ![Java](https://img.shields.io/badge/Java-26-007396?style=flat-square&logo=java&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.0-6DB33F?style=flat-square&logo=spring-boot&logoColor=white)
@@ -9,7 +9,7 @@
 
 ---
 
-## 📌 Sobre o Projeto
+## Sobre o Projeto
 
 O **Memora** é uma API RESTful de alta performance desenvolvida para otimizar o processo de retenção de conhecimento através do método de **Repetição Espaçada** (*Spaced Repetition System - SRS*). 
 
@@ -17,22 +17,22 @@ A plataforma permite que os usuários criem **Áreas de Trabalho (Workspaces)**,
 
 ---
 
-## ✨ Funcionalidades Principais
+## Funcionalidades Principais
 
-- 🔐 **Autenticação & Segurança Robusta**: Registro e login de usuários via JWT (JSON Web Token), com senhas criptografadas usando BCrypt e controle de acesso individualizado por recurso.
-- 📁 **Gerenciamento Hierárquico de Conteúdo**:
+- **Autenticação & Segurança Robusta**: Registro e login de usuários via JWT (JSON Web Token), com senhas criptografadas usando BCrypt e controle de acesso individualizado por recurso.
+- **Gerenciamento Hierárquico de Conteúdo**:
   - **Workspaces**: Áreas de estudo separadas por temas ou disciplinas.
   - **Módulos**: Tópicos ou capítulos dentro de um workspace.
   - **Desafios**: Questões de múltipla escolha vinculadas a um módulo.
   - **Alternativas**: Opções de resposta com sinalização da alternativa correta.
-- ⏳ **Algoritmo de Repetição Espaçada**:
+- **Algoritmo de Repetição Espaçada**:
   - Cálculo inteligente do tempo de disponibilidade do desafio (`availableAgainAt`) multiplicando os fatores do módulo e desafio pelo intervalo de dificuldade escolhido (*Easy, Medium, Hard*).
-- 🛠️ **Tratamento Global de Exceções**: Retornos padronizados em formato JSON (`NotFoundException`, `ConflictException`, `BadRequestException`, `UnauthorizedException`).
-- 📄 **Documentação Interativa (Swagger/OpenAPI)**: Interface amigável para testes de endpoints integrada via `springdoc-openapi`.
+- **Tratamento Global de Exceções**: Retornos padronizados em formato JSON (`NotFoundException`, `ConflictException`, `BadRequestException`, `UnauthorizedException`).
+- **Documentação Interativa (Swagger/OpenAPI)**: Interface amigável para testes de endpoints integrada via `springdoc-openapi`.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 | Tecnologia | Descrição |
 | :--- | :--- |
@@ -48,7 +48,7 @@ A plataforma permite que os usuários criem **Áreas de Trabalho (Workspaces)**,
 
 ---
 
-## 🚀 Como Executar o Projeto
+## Como Executar o Projeto
 
 ### Pré-requisitos
 - **Java 26** (JDK 26 instalado e configurado no `PATH`)
@@ -57,7 +57,7 @@ A plataforma permite que os usuários criem **Áreas de Trabalho (Workspaces)**,
 
 ---
 
-### 🟢 Opção 1: Executando via Docker Compose (Recomendado)
+### Opção 1: Executando via Docker Compose (Recomendado)
 
 1. **Clone o repositório:**
    ```bash
@@ -74,7 +74,7 @@ A plataforma permite que os usuários criem **Áreas de Trabalho (Workspaces)**,
 
 ---
 
-### 🟡 Opção 2: Executando Localmente com Maven
+### Opção 2: Executando Localmente com Maven
 
 1. **Certifique-se de ter um banco PostgreSQL rodando** com as credenciais configuradas no `application.properties`:
    ```properties
@@ -95,7 +95,7 @@ A plataforma permite que os usuários criem **Áreas de Trabalho (Workspaces)**,
 
 ---
 
-## 📄 Documentação da API (Swagger UI)
+## Documentação da API (Swagger UI)
 
 Após iniciar a aplicação, acesse a documentação interativa no navegador para testar todos os endpoints disponíveis:
 
@@ -103,7 +103,7 @@ Após iniciar a aplicação, acesse a documentação interativa no navegador par
 
 ---
 
-## 🧪 Executando os Testes Unitários
+## Executando os Testes Unitários
 
 O projeto possui uma suíte completa de testes unitários cobrindo as regras de negócio, services e segurança.
 
@@ -121,15 +121,15 @@ Para rodar todos os testes unitários:
 
 ---
 
-## 🗺️ Visão Geral das Rotas (Endpoints)
+## Visão Geral das Rotas (Endpoints)
 
-### 🔑 Autenticação (`/auth`)
+### Autenticação (`/auth`)
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
 | `POST` | `/auth/signup` | Cadastra um novo usuário e retorna token JWT |
 | `POST` | `/auth/signin` | Realiza login e retorna token JWT |
 
-### 📂 Workspaces (`/workspaces`)
+### Workspaces (`/workspaces`)
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
 | `POST` | `/workspaces` | Cria um novo workspace |
@@ -138,7 +138,7 @@ Para rodar todos os testes unitários:
 | `PUT` | `/workspaces/{workspaceId}` | Atualiza um workspace |
 | `DELETE` | `/workspaces/{workspaceId}` | Remove um workspace |
 
-### 📦 Módulos (`/workspaces/{workspaceId}/modules`)
+### Módulos (`/workspaces/{workspaceId}/modules`)
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
 | `POST` | `/workspaces/{workspaceId}/modules` | Cria um módulo dentro do workspace |
@@ -147,7 +147,7 @@ Para rodar todos os testes unitários:
 | `PUT` | `/workspaces/{workspaceId}/modules/{moduleId}` | Atualiza um módulo |
 | `DELETE` | `/workspaces/{workspaceId}/modules/{moduleId}` | Deleta um módulo |
 
-### 🎯 Desafios (`/workspaces/{workspaceId}/modules/{moduleId}/challenges`)
+### Desafios (`/workspaces/{workspaceId}/modules/{moduleId}/challenges`)
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
 | `POST` | `.../challenges` | Cria um novo desafio |
