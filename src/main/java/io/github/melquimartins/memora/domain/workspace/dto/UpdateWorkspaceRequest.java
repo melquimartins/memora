@@ -8,8 +8,7 @@ public record UpdateWorkspaceRequest(
         @Size(min = 4, max = 32, message = "O título deve ter entre 4 e 32 caracteres.")
         String title,
 
-        @NotBlankIfPresent
-        @Size(min = 4, max = 120, message = "A descrição deve ter entre 4 e 120 caracteres.")
+        @Size(max = 120, message = "A descrição deve ter no máximo 120 caracteres.")
         String description
 ) {
 }

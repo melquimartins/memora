@@ -5,6 +5,7 @@ import io.github.melquimartins.memora.domain.workspace.dto.UpdateWorkspaceReques
 import io.github.melquimartins.memora.domain.user.User;
 import io.github.melquimartins.memora.domain.workspace.dto.WorkspaceResponse;
 import io.github.melquimartins.memora.domain.workspace.mapper.WorkspaceMapper;
+import io.github.melquimartins.memora.shared.exception.BadRequestException;
 import io.github.melquimartins.memora.shared.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,10 @@ public class WorkspaceService {
         Workspace workspace = repository
                 .findByIdAndUserId(workspaceId, user.getId())
                 .orElseThrow(() -> new NotFoundException("Área de trabalho não encontrada."));
+
+        if (request.title() == null && request.description() == null) {
+            throw new BadRequestException("Nenhum campo para atualizar foi informado.");
+        }
 
         if (request.title() != null) {
             workspace.setTitle(request.title());

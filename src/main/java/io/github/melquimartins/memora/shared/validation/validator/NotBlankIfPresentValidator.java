@@ -17,7 +17,7 @@ public class NotBlankIfPresentValidator
             return true;
         }
 
-        return !value.trim().isEmpty();
+        return !value.isBlank();
     }
 
 }

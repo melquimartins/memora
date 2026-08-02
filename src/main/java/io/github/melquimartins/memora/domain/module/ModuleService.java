@@ -7,10 +7,9 @@ import io.github.melquimartins.memora.domain.module.mapper.ModuleMapper;
 import io.github.melquimartins.memora.domain.user.User;
 import io.github.melquimartins.memora.domain.workspace.Workspace;
 import io.github.melquimartins.memora.domain.workspace.WorkspaceRepository;
+import io.github.melquimartins.memora.shared.exception.BadRequestException;
 import io.github.melquimartins.memora.shared.exception.NotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -76,6 +75,10 @@ public class ModuleService {
         Module module = repository
                 .findByIdAndWorkspaceIdAndWorkspaceUserId(moduleId, workspaceId, user.getId())
                 .orElseThrow(() -> new NotFoundException("Módulo não encontrado."));
+
+        if (request.title() == null && request.description() == null) {
+            throw new BadRequestException("Nenhum campo para atualizar foi informado.");
+        }
 
         if (request.title() != null) {
             module.setTitle(request.title());

@@ -2,7 +2,7 @@
 
 ![Java](https://img.shields.io/badge/Java-26-007396?style=flat-square&logo=java&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.0-6DB33F?style=flat-square&logo=spring-boot&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![Tests](https://img.shields.io/badge/Tests-40_Passing-2ea44f?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-gray?style=flat-square)
@@ -46,6 +46,7 @@ A plataforma permite que os usuários criem **Áreas de Trabalho (Workspaces)**,
 | **Spring Security** | Autenticação, autorização e proteção de endpoints |
 | **Java JWT (Auth0)** | Geração e validação de tokens JWT |
 | **PostgreSQL** | Banco de dados relacional para ambiente de produção/desenvolvimento |
+| **spring-dotenv** | Carregamento automático de variáveis de ambiente a partir do arquivo `.env` |
 | **Springdoc OpenAPI UI** | Documentação interativa da API (`/swagger-ui.html`) |
 | **JUnit 5 & Mockito** | Testes unitários de alta cobertura |
 | **Docker & Docker Compose** | Conteinerização e orquestração da aplicação e banco de dados |
@@ -57,7 +58,26 @@ A plataforma permite que os usuários criem **Áreas de Trabalho (Workspaces)**,
 ### Pré-requisitos
 - **Java 26** (JDK 26 instalado e configurado no `PATH`)
 - **Maven 3.8+** (ou utilize o wrapper `./mvnw` incluso no projeto)
-- **Docker** e **Docker Compose** (opcional, mas recomendado)
+- **Docker** e **Docker Compose** (para subir o banco de dados e/ou a aplicação em container)
+
+---
+
+### Configuração das Variáveis de Ambiente
+
+O projeto utiliza um arquivo `.env` como única fonte de configuração, lido automaticamente tanto pelo **Docker Compose** quanto pelo **Spring Boot** (via biblioteca `spring-dotenv`).
+
+1. **Crie o arquivo `.env` na raiz do projeto** baseado no exemplo abaixo:
+   ```env
+   POSTGRES_DB=memora
+   POSTGRES_USER=seu_usuario
+   POSTGRES_PASSWORD=sua_senha
+   JWT_SECRET=seu_jwt_secret
+   SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/memora
+   SPRING_DATASOURCE_USERNAME=seu_usuario
+   SPRING_DATASOURCE_PASSWORD=sua_senha
+   ```
+
+> ⚠️ O arquivo `.env` **não deve ser commitado**. Ele já está listado no `.gitignore`.
 
 ---
 
@@ -69,25 +89,27 @@ A plataforma permite que os usuários criem **Áreas de Trabalho (Workspaces)**,
    cd memora
    ```
 
-2. **Suba o banco PostgreSQL e a aplicação:**
+2. **Configure o `.env`** conforme a seção acima.
+
+3. **Suba o banco PostgreSQL e a aplicação:**
    ```bash
    docker-compose up -d
    ```
 
-3. A aplicação estará disponível em `http://localhost:8080`.
+4. A aplicação estará disponível em `http://localhost:8080`.
 
 ---
 
 ### Opção 2: Executando Localmente com Maven
 
-1. **Certifique-se de ter um banco PostgreSQL rodando** com as credenciais configuradas no `application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/memora
-   spring.datasource.username=postgres
-   spring.datasource.password=postgres
+1. **Configure o `.env`** conforme a seção acima (o `spring-dotenv` o lê automaticamente).
+
+2. **Suba apenas o banco de dados via Docker:**
+   ```bash
+   docker-compose up -d db
    ```
 
-2. **Execute a aplicação via Maven Wrapper:**
+3. **Execute a aplicação via Maven Wrapper:**
    - **Linux / macOS:**
      ```bash
      ./mvnw spring-boot:run
@@ -139,7 +161,7 @@ Para rodar todos os testes unitários:
 | `POST` | `/workspaces` | Cria um novo workspace |
 | `GET` | `/workspaces` | Lista todos os workspaces do usuário logado |
 | `GET` | `/workspaces/{workspaceId}` | Busca um workspace por ID |
-| `PUT` | `/workspaces/{workspaceId}` | Atualiza um workspace |
+| `PATCH` | `/workspaces/{workspaceId}` | Atualiza parcialmente um workspace |
 | `DELETE` | `/workspaces/{workspaceId}` | Remove um workspace |
 
 ### Módulos (`/workspaces/{workspaceId}/modules`)
@@ -148,7 +170,7 @@ Para rodar todos os testes unitários:
 | `POST` | `/workspaces/{workspaceId}/modules` | Cria um módulo dentro do workspace |
 | `GET` | `/workspaces/{workspaceId}/modules` | Lista os módulos do workspace |
 | `GET` | `/workspaces/{workspaceId}/modules/{moduleId}` | Detalhes do módulo |
-| `PUT` | `/workspaces/{workspaceId}/modules/{moduleId}` | Atualiza um módulo |
+| `PATCH` | `/workspaces/{workspaceId}/modules/{moduleId}` | Atualiza parcialmente um módulo |
 | `DELETE` | `/workspaces/{workspaceId}/modules/{moduleId}` | Deleta um módulo |
 
 ### Desafios (`/workspaces/{workspaceId}/modules/{moduleId}/challenges`)

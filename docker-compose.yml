@@ -1,24 +1,22 @@
 services:
   db:
     image: postgres:15
-    container_name: postgres-db-memora
+    container_name: memora-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: memora_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
   app:
     build: .
-    container_name: spring-boot-memora
+    container_name: memora-app
     restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/memora_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      JWT_SECRET: "7f3c9a2e1d8b6f4a0c5e7d9b3a1f8c6e2d4b7a9f0c3e5d8b1a6f9c2e7d4b8a"
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "8080:8080"
-    depends_on:
-      - db

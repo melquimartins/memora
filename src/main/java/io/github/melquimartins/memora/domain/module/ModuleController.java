@@ -136,6 +136,10 @@ public class ModuleController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Módulo não encontrado."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Nenhum campo para atualizar foi informado."
             )
     })
     @PatchMapping("/{moduleId}")

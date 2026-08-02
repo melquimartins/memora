@@ -161,6 +161,10 @@ public class AlternativeController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Alternativa não encontrada."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Nenhum campo para atualizar foi informado."
             )
     })
     @PatchMapping("/{alternativeId}")

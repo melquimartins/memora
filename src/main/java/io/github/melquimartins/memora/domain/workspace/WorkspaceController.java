@@ -129,6 +129,10 @@ public class WorkspaceController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Área de trabalho não encontrada."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Nenhum campo para atualizar foi informado."
             )
     })
     @PatchMapping("/{workspaceId}")

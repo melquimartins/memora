@@ -2,78 +2,78 @@ package io.github.melquimartins.memora.security;
 
 import io.github.melquimartins.memora.domain.user.User;
 import io.github.melquimartins.memora.domain.user.UserRepository;
+import io.github.melquimartins.memora.shared.exception.UnauthorizedException;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserRepository repository;
+    private final UserRepository userRepository;
 
-    public SecurityFilter(JwtService jwtService, UserRepository repository) {
+    public SecurityFilter(JwtService jwtService, UserRepository userRepository) {
         this.jwtService = jwtService;
-        this.repository = repository;
+        this.userRepository = userRepository;
     }
 
     @Override
     protected void doFilterInternal(
-            @NonNull
+            @Nonnull
             HttpServletRequest request,
-            @NonNull
+            @Nonnull
             HttpServletResponse response,
-            @NonNull
+            @Nonnull
             FilterChain filterChain
     ) throws ServletException, IOException {
-        String token = recoverToken(request);
+        try {
+            String token = recoverToken(request);
 
-        if (token != null) {
-            try {
-                String email = jwtService.validateToken(token);
+            if (token != null) {
+                String email = jwtService.validateToken(recoverToken(request));
 
-                if (email != null) {
-                    User user = repository.findByEmail(email).orElseThrow(() ->
-                            new UsernameNotFoundException("Usuário não encontrado.")
-                    );
+                User user = userRepository.findByEmail(email).orElseThrow(UnauthorizedException::new);
 
-                    var authenticationToken = new UsernamePasswordAuthenticationToken(
-                            user, false, user.getAuthorities()
-                    );
-
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
-            } catch (Exception e) {
-                SecurityContextHolder.clearContext();
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(new UsernamePasswordAuthenticationToken(
+                                user,
+                                null,
+                                user.getAuthorities()
+                        ));
             }
+        } catch (AuthenticationException e) {
+            SecurityContextHolder.clearContext();
+        } finally {
+            filterChain.doFilter(request, response);
         }
-
-        filterChain.doFilter(request, response);
     }
 
-    private String recoverToken(@NonNull HttpServletRequest request) {
+    private String recoverToken(@Nonnull HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {
             return null;
         }
 
-        return Arrays.stream(cookies)
-                .filter(cookie -> "accessToken".equals(cookie.getName()))
-                .findFirst()
-                .map(Cookie::getValue)
-                .orElse(null);
+        for (Cookie cookie : cookies) {
+            if ("access-token".equals(cookie.getName()) && !cookie.getValue().isBlank()) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 
 }

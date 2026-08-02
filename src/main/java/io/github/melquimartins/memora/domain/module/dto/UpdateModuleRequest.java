@@ -12,11 +12,9 @@ public record UpdateModuleRequest(
         )
         String title,
 
-        @NotBlankIfPresent
         @Size(
-                min = 4,
                 max = 120,
-                message = "A descrição deve ter entre 4 e 120 caracteres."
+                message = "A descrição deve ter no máximo 120 caracteres."
         )
         String description
 ) {

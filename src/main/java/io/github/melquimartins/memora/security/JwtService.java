@@ -19,28 +19,25 @@ public class JwtService {
     private final Algorithm algorithm;
 
     public JwtService(@Value("${jwt.secret}") String secret) {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("JWT_SECRET não configurado.");
+        }
+
         this.algorithm = Algorithm.HMAC256(secret);
     }
 
     public String generateToken(String subject, Instant expirationDate) {
-        try {
-            return JWT
-                    .create()
-                    .withIssuer("memora")
-                    .withSubject(subject)
-                    .withExpiresAt(expirationDate)
-                    .sign(algorithm);
-        } catch (JWTCreationException e) {
-            throw new InternalServerErrorException(
-                    "Não foi possível gerar o token de autenticação. Tente novamente mais tarde.");
-        }
+        return JWT
+                .create()
+                .withSubject(subject)
+                .withExpiresAt(expirationDate)
+                .sign(algorithm);
     }
 
     public String validateToken(String token) {
         try {
             return JWT
                     .require(algorithm)
-                    .withIssuer("memora")
                     .build()
                     .verify(token)
                     .getSubject();

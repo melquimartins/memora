@@ -7,10 +7,9 @@ import io.github.melquimartins.memora.domain.alternative.mapper.AlternativeMappe
 import io.github.melquimartins.memora.domain.challenge.Challenge;
 import io.github.melquimartins.memora.domain.challenge.ChallengeRepository;
 import io.github.melquimartins.memora.domain.user.User;
+import io.github.melquimartins.memora.shared.exception.BadRequestException;
 import io.github.melquimartins.memora.shared.exception.NotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -73,7 +72,6 @@ public class AlternativeService {
                         )
                         .orElseThrow(() -> new NotFoundException(
                                 "Nenhuma alternativa foi encontrada."));
-        ;
 
         return mapper.toResponseList(alternatives);
     }
@@ -115,6 +113,10 @@ public class AlternativeService {
                         user.getId()
                 )
                 .orElseThrow(() -> new NotFoundException("Alternativa não encontrada."));
+
+        if (request.text() == null && request.correct() == null) {
+            throw new BadRequestException("Nenhum campo para atualizar foi informado.");
+        }
 
         if (request.text() != null) {
             alternative.setText(request.text());

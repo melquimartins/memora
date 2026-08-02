@@ -1,6 +1,8 @@
 package io.github.melquimartins.memora.shared.exception;
 
-public class UnauthorizedException extends RuntimeException {
+import org.springframework.security.core.AuthenticationException;
+
+public class UnauthorizedException extends AuthenticationException {
 
     private static final String DEFAULT_MESSAGE = "Você não tem permissão para acessar este recurso.";
 
